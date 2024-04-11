@@ -3,16 +3,13 @@ import DB.py
 import threading
 
 def Server():
-    serverSocket = socket.socket()
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(("Yalla Chat", 5050))
 
+    while True:
+        conn, addr = server.accept()
+        thread = threading.Thread(target=handler, args=(conn, addr))
+        thread.start()
 
-
-
-
-
-
-
-while True:
-    conn, addr = server.accept()
-    thread = threading.Thread(target=handler, args=(conn, addr))
-    thread.start()
+def handler():
+    pass
