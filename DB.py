@@ -2,7 +2,6 @@ import sqlite3
 import os
 conn = sqlite3.connect("accounts.db")
 c = conn.cursor()
-
 def create_accounts(c):
     c.execute('''CREATE TABLE IF NOT EXISTS accounts(user_id INTEGER PRIMARY KEY AUTOINCREMENT,
              name TEXT,
