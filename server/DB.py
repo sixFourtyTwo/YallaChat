@@ -2,6 +2,7 @@ import sqlite3
 import os
 conn = sqlite3.connect("accounts.db")
 c = conn.cursor()
+
 def create_accounts(c):
     c.execute('''CREATE TABLE IF NOT EXISTS accounts(user_id INTEGER PRIMARY KEY AUTOINCREMENT,
              name TEXT,
@@ -14,10 +15,16 @@ def create_chats(c):
     
     
 def register_account(name, email, username, password):
-    c.execute("INSERT INTO accounts VALUES (NULL, ?, ?, ?, ?);", (name, email,username, password))
-    conn.commit()
-    print("Accout registered!")
-    return True
+    c.execute("SELECT username FROM accounts WHERE username=?", (username,))
+    result = c.fetchone()
+    if result:
+        print("User already exits try logging in ")
+        return False
+    else:
+        c.execute("INSERT INTO accounts VALUES (NULL, ?, ?, ?, ?);", (name, email,username, password))
+        conn.commit()
+        print("Accout registered!")
+        return True
 
 def authenticate(username, password):
     c.execute("SELECT username FROM accounts WHERE username=?", (username,))
@@ -35,7 +42,6 @@ def authenticate(username, password):
          return True
         
     
-
 
 
 conn.close()
