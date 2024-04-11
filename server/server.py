@@ -13,7 +13,10 @@ def handler(conn, addr):
         username, password = message[1], message[2]
         reply = DB.authenticate(username, password)
         conn.send(reply.encode())
-        
+    if(cmnd == "REGISTER"):
+        name, email, username, password = message[1], message[2], message[3], message[4]
+        reply = DB.register_account(name, email, username, password)
+        conn.send(reply.encode)
 
 def Server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
