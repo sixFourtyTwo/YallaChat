@@ -19,27 +19,28 @@ def register_account(name, email, username, password):
     result = c.fetchone()
     if result:
         print("User already exits try logging in ")
-        return False
+        return 409
     else:
         c.execute("INSERT INTO accounts VALUES (NULL, ?, ?, ?, ?);", (name, email,username, password))
         conn.commit()
         print("Accout registered!")
-        return True
+        return 200
 
 def authenticate(username, password):
     c.execute("SELECT username FROM accounts WHERE username=?", (username,))
     result = c.fetchone()
     if not result:
         print("User not found")
-        return False
+        return 401
     else:
          c.execute("SELECT username, password FROM accounts WHERE username=? AND password=?", (username,password))
          result = c.fetchone()
          if not result:
              print("wrong password!")
+             return 409
          else:
             print("Login succesful")
-         return True
+            return 200
         
     
 
