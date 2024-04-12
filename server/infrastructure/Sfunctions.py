@@ -1,6 +1,4 @@
-
 import sqlite3
-
 
 def register_account(conn,c,name, email, username, password):
     c.execute("SELECT username FROM accounts WHERE username=?", (username,))
@@ -30,5 +28,16 @@ def authenticate(c,username, password):
             print("Login succesful")
             return '100'
         
-    
+def login(server, message, cursor):
+    username, password = message[1], message[2]
+    reply = authenticate(cursor,username, password)
+    server.send(reply.encode())
 
+    return username
+
+def register(server, message, cursor, db_conn):
+    name, email, username, password = message[1], message[2], message[3], message[4]
+    reply = register_account(db_conn, cursor, name, email, username, password)
+    server.send(reply.encode())
+
+    return username

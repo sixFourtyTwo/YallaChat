@@ -1,7 +1,6 @@
 import socket
 import DB
 import threading
-import queue
 import infrastructure.Sfunctions as Sfunc
 
 port = int(input('Port Number: '))
@@ -16,24 +15,16 @@ def handler(conn, addr):
         try:
             message = conn.recv(1024).decode('utf-8').split()
             if message == []:
-                continue
-            print(message)
+                raise ConnectionResetError
+        
             cmnd = message[0]
             if(cmnd == 'LOGIN'): 
-                username, password = message[1], message[2]
-                reply = Sfunc.authenticate(cursor,username, password)
-                conn.send(reply.encode())
-
+                username = Sfunc.login(conn, message, cursor)
                 onlineUsers.update({username:username})
-                currentUser = username 
+                currentUser = username
 
             elif(cmnd == "REGISTER"):
-                name, email, username, password = message[1], message[2], message[3], message[4]
-                reply = Sfunc.register_account(db_conn, cursor, name, email, username, password)
-                print('are we sending?')
-                print(reply)
-                conn.send(reply.encode())
-
+                username = Sfunc.register(conn, message, cursor, db_conn)
                 onlineUsers.update({username:username})
                 currentUser = username
 
@@ -41,7 +32,7 @@ def handler(conn, addr):
                 user = message[1]
                 if (user not in onlineUsers):
                     return 'OFFLINE'
-                else: return 'ONLINE'   
+                else: return 'ONLINE'
 
             elif(cmnd == 'DISCONNECT'):
                 if(currentUser != None):
@@ -52,7 +43,7 @@ def handler(conn, addr):
             if(currentUser != None):
                 onlineUsers.pop(currentUser)
                 break
-    print('mark2')
+    print('User ' + username + ' has disconnected.')
             
 
 def Server():

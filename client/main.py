@@ -10,3 +10,9 @@ username = input('Enter username: ')
 password = input('Enter password: ')
 
 print(funcs.register(client, name, email, username, password))
+
+while True:
+    try:
+        continue
+    except KeyboardInterrupt:
+        break
