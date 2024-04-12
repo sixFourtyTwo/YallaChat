@@ -28,11 +28,11 @@ def register(client, name, email, username, password):
     return codeHandler(repCode)
 
 def codeHandler(code):
-    if(code == '100'):
-        return 'Account has been registered.'
-    elif(code == '102'):
+    if(code == 100):
+        return 'Success'
+    elif(code == 102):
         return 'The password you entered is incorrect.'
-    elif(code == '104'):
+    elif(code == 104):
         return 'The given user is not found.'
-    elif(code == '105'):
+    elif(code == 105):
         return 'Login Successful.'
