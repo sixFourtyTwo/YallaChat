@@ -7,14 +7,21 @@ import infrastructure.Sfunctions as Sfunc
 port = int(input('Port Number: '))
 onlineUsers = {}
 
-def handler(conn):
+def handler(conn, addr):
     db_conn, cursor = DB.connect_to_database()
     DB.create_accounts(cursor)
     print("Database connected successfully.")
     currentUser = None
     while True:
         try:
+            print('mark pre')
+            if(conn.recv(1024).decode('utf-8') == 0):
+                print('wallahi im finished')
+                break
+            print('mark post')
+
             message = conn.recv(1024).decode('utf-8').split()
+            print(message)
             cmnd = message[0]
             if(cmnd == 'LOGIN'): 
                 username, password = message[1], message[2]
@@ -27,6 +34,7 @@ def handler(conn):
             elif(cmnd == "REGISTER"):
                 name, email, username, password = message[1], message[2], message[3], message[4]
                 reply = Sfunc.register_account(db_conn, cursor, name, email, username, password)
+                print('are we sending?')
                 conn.send(reply.encode())
 
                 onlineUsers.update({username:username})
@@ -41,12 +49,13 @@ def handler(conn):
             elif(cmnd == 'DISCONNECT'):
                 if(currentUser != None):
                     onlineUsers.pop(currentUser)
-                    return
-                pass
+                    break
+                break
         except (ConnectionResetError, ConnectionAbortedError): 
             if(currentUser != None):
                 onlineUsers.pop(currentUser)
-                return
+                break
+    print('mark2')
             
 
 def Server():

@@ -24,7 +24,9 @@ def register(client, name, email, username, password):
     message = 'REGISTER ' + name + ' ' + email + ' ' + username + ' ' + password
     client.send(message.encode('utf-8'))
 
+    print('we are here')
     repCode = client.recv(1024).decode('utf-8')
+    print('we are no longer here')
     return codeHandler(repCode)
 
 def isOnline(client, user):
