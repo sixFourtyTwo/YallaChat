@@ -36,3 +36,5 @@ def codeHandler(code):
         return 'The given user is not found.'
     elif(code == 105):
         return 'Login Successful.'
+    elif(code == 111):
+        return 'User already exits, try loggin in.'
