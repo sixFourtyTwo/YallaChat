@@ -38,7 +38,16 @@ def login(client, uname, password):
 
 def collectRegister(client):
     name = input('Enter your name: ')
-    email = input('Enter email: ')
+
+    while True:
+        email = input('Enter email: ')
+        try:
+            if(email.split('@')[1] != 'gmail.com'):
+                raise Exception
+            else: break
+        except Exception:
+            print('Email is invalid.')
+
     uname = input('Enter username: ')
     password = input('Enter password: ')
 
@@ -57,7 +66,6 @@ def isOnlineCollector(client):
 
 def isOnline(client, user):
     message = 'IOnline ' + user
-    print(message)
     client.send(message.encode('utf-8'))
 
     return client.recv(1024).decode('utf-8')

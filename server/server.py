@@ -54,10 +54,20 @@ def Server():
     server.bind((socket.gethostbyname(socket.gethostname()), port))
 
     print('Server is now online.')
-    server.listen()
+    
+    try:
+        server.listen()
+    except KeyboardInterrupt:
+        print('Server shutting down.')
+        return
+    
     while True:
-        conn, addr = server.accept()
-        thread = threading.Thread(target=handler, args=(conn, addr))
-        thread.start()
+        try:
+            conn, addr = server.accept()
+            thread = threading.Thread(target=handler, args=(conn, addr))
+            thread.start()
+        except KeyboardInterrupt: #this does not work, because server.accept() is blocking indefinitely
+            print('Server shutting down.')
+            break
 
 Server()
