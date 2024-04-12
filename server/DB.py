@@ -16,23 +16,24 @@ def create_chats(c):
 def register_account(name, email, username, password):
     c.execute("INSERT INTO accounts VALUES (NULL, ?, ?, ?, ?);", (name, email,username, password))
     conn.commit()
-    print("Accout registered!")
-    return True
+    print("Account registered!")
+    return '100'
 
 def authenticate(username, password):
     c.execute("SELECT username FROM accounts WHERE username=?", (username,))
     result = c.fetchone()
     if not result:
         print("User not found")
-        return False
+        return '104'
     else:
          c.execute("SELECT username, password FROM accounts WHERE username=? AND password=?", (username,password))
          result = c.fetchone()
          if not result:
-             print("wrong password!")
+            print('Wrong Password.')
+            return '102'
          else:
             print("Login succesful")
-         return True
+            return '105'
         
     
 
