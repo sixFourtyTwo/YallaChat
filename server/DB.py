@@ -13,32 +13,37 @@ def create_accounts(c):
              password TEXT);
            ''')
 def create_chats(c):
-    c.execute('''CREATE TABLE IF NOT EXISTS chats (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    participant1 TEXT,
-    participant2 TEXT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,  -- Timestamp column
-    UNIQUE(participant1, participant2)
+    c.execute('''CREATE TABLE Chats (
+    chat_id INTEGER PRIMARY KEY,
+    sender_id INTEGER NOT NULL,
+    receiver_id INTEGER NOT NULL,
+    last_message TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES Users(user_id),
+    FOREIGN KEY (receiver_id) REFERENCES Users(user_id)
 );''')
 def create_messages(c):
-    c.execute('''CREATE TABLE IF NOT EXISTS messages (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    sender TEXT,
-    recipient TEXT,
-    content TEXT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    chat_id INTEGER,
-    FOREIGN KEY (chat_id) REFERENCES chats(id)
+    c.execute('''CREATE TABLE message (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	sender_id INT NOT NULL,
+	receiver_id INT NOT NULL,
+	message TEXT,
+	send_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (sender_id) REFERENCES users(id),
+	FOREIGN KEY (receiver_id) REFERENCES users(id)
 );''')
 
 def fetch_chats(cursor):
-        cursor.execute("SELECT id, participant1, participant2 FROM chats")
+        cursor.execute('''SELECT id, participant1, participant2 FROM chats''')
         chats = cursor.fetchall()
         return chats
 def fetch_messages(cursor, chat_id):
         messages = cursor.execute("SELECT sender, content, timestamp FROM messages WHERE chat_id = ? ORDER BY timestamp", (chat_id,))
         messages = cursor.fetchall()
         return messages
+conn, c = connect_to_database()
+create_messages(c)
+
     
     
 
