@@ -5,23 +5,49 @@ import queue
 import infrastructure.Sfunctions as Sfunc
 
 port = int(input('Port Number: '))
+onlineUsers = {}
 
-
-def handler(conn, addr):
+def handler(conn):
+    db_conn, cursor = DB.connect_to_database()
+    DB.create_accounts(cursor)
+    print("Database connected successfully.")
+    currentUser = None
     while True:
-        db_conn, cursor = DB.connect_to_database()
-        DB.create_accounts(cursor)
-        print("Database connected successfully.")
-        message = conn.recv(1024).decode('utf-8').split()
-        cmnd = message[0]
-        if(cmnd == 'LOGIN'): 
-            username, password = message[1], message[2]
-            reply = Sfunc.authenticate(cursor,username, password)
-            conn.send(reply.encode())
-        if(cmnd == "REGISTER"):
-            name, email, username, password = message[1], message[2], message[3], message[4]
-            reply = Sfunc.register_account(db_conn, cursor, name, email, username, password)
-            conn.send(reply.encode())
+        try:
+            message = conn.recv(1024).decode('utf-8').split()
+            cmnd = message[0]
+            if(cmnd == 'LOGIN'): 
+                username, password = message[1], message[2]
+                reply = Sfunc.authenticate(cursor,username, password)
+                conn.send(reply.encode())
+
+                onlineUsers.update({username:username})
+                currentUser = username 
+
+            elif(cmnd == "REGISTER"):
+                name, email, username, password = message[1], message[2], message[3], message[4]
+                reply = Sfunc.register_account(db_conn, cursor, name, email, username, password)
+                conn.send(reply.encode())
+
+                onlineUsers.update({username:username})
+                currentUser = username
+
+            elif(cmnd == 'IOnline'):
+                user = message[1]
+                if (user not in onlineUsers):
+                    return 'OFFLINE'
+                else: return 'ONLINE'   
+
+            elif(cmnd == 'DISCONNECT'):
+                if(currentUser != None):
+                    onlineUsers.pop(currentUser)
+                    return
+                pass
+        except (ConnectionResetError, ConnectionAbortedError): 
+            if(currentUser != None):
+                onlineUsers.pop(currentUser)
+                return
+            
 
 def Server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

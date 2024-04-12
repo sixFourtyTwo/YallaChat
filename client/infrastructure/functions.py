@@ -27,6 +27,12 @@ def register(client, name, email, username, password):
     repCode = client.recv(1024).decode('utf-8')
     return codeHandler(repCode)
 
+def isOnline(client, user):
+    message = 'IOnline ' + user
+    client.send(message.encode('utf-8'))
+
+    return client.recv(1024).decode('utf-8')
+
 def codeHandler(code):
     if(code == '100'):
         return 'Success'
