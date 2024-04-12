@@ -3,7 +3,7 @@ import DB
 import threading
 
 
-port = input('Port Number: ')
+port = int(input('Port Number: '))
 
 
 def handler(conn, addr):
@@ -20,7 +20,7 @@ def handler(conn, addr):
 
 def Server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((socket.gethostbyname(socket.gethostname()), 50))
+    server.bind((socket.gethostbyname(socket.gethostname()), port))
 
     print('Server is now online.')
     server.listen()
