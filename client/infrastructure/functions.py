@@ -13,12 +13,36 @@ def connect(client):
     print('Connection failed.')
     return
 
+def commandHandler(client, command):
+    if(command == 'login'):
+        collectLogin(client)
+    elif(command == 'register'):
+        collectRegister(client)
+    elif(command == 'onlinecheck'):
+        isOnlineCollector(client)
+    elif(command == 'help'):
+        print('Commands: login, register, onlinecheck, help :D')
+
+def collectLogin(client):
+    uname = input('Username: ')
+    password = input('Password: ')
+    
+    return login(client, uname, password)
+
 def login(client, uname, password):
     message = 'LOGIN ' + uname + ' ' + password
     client.send(message.encode('utf-8'))
 
     repCode = client.recv(1024).decode('utf-8')
     return codeHandler(repCode)
+
+def collectRegister(client):
+    name = input('Enter your name: ')
+    email = input('Enter email: ')
+    uname = input('Enter username: ')
+    password = input('Enter password: ')
+
+    return register(client, name, email, uname, password)
 
 def register(client, name, email, username, password):
     message = 'REGISTER ' + name + ' ' + email + ' ' + username + ' ' + password
@@ -27,8 +51,13 @@ def register(client, name, email, username, password):
     repCode = client.recv(1024).decode('utf-8')
     return codeHandler(repCode)
 
+def isOnlineCollector(client):
+    user = input('Who do you wish to check?: ')
+    print(isOnline(client, user))
+
 def isOnline(client, user):
     message = 'IOnline ' + user
+    print(message)
     client.send(message.encode('utf-8'))
 
     return client.recv(1024).decode('utf-8')

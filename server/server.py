@@ -10,6 +10,7 @@ def handler(conn, addr):
     db_conn, cursor = DB.connect_to_database()
     DB.create_accounts(cursor)
     print("Database connected successfully.")
+    
     currentUser = None
     while True:
         try:
@@ -31,8 +32,10 @@ def handler(conn, addr):
             elif(cmnd == 'IOnline'):
                 user = message[1]
                 if (user not in onlineUsers):
-                    return 'OFFLINE'
-                else: return 'ONLINE'
+                    reply = 'OFFLINE'
+                else: reply = 'ONLINE'
+                
+                conn.send(reply.encode('utf-8'))
 
             elif(cmnd == 'DISCONNECT'):
                 if(currentUser != None):
