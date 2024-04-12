@@ -28,13 +28,13 @@ def register(client, name, email, username, password):
     return codeHandler(repCode)
 
 def codeHandler(code):
-    if(code == 100):
+    if(code == '100'):
         return 'Success'
-    elif(code == 102):
+    elif(code == '102'):
         return 'The password you entered is incorrect.'
-    elif(code == 104):
+    elif(code == '104'):
         return 'The given user is not found.'
-    elif(code == 105):
+    elif(code == '105'):
         return 'Login Successful.'
-    elif(code == 111):
+    elif(code == '111'):
         return 'User already exits, try loggin in.'

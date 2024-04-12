@@ -1,8 +1,10 @@
 import sqlite3
 import os
-conn = sqlite3.connect("accounts.db")
-c = conn.cursor()
 
+def connect_to_database():
+    conn = sqlite3.connect("accounts.db")
+    c = conn.cursor()
+    return conn, c
 def create_accounts(c):
     c.execute('''CREATE TABLE IF NOT EXISTS accounts(user_id INTEGER PRIMARY KEY AUTOINCREMENT,
              name TEXT,
@@ -39,35 +41,5 @@ def fetch_messages(cursor, chat_id):
         return messages
     
     
-def register_account(name, email, username, password):
-    c.execute("SELECT username FROM accounts WHERE username=?", (username,))
-    result = c.fetchone()
-    if result:
-        print("User already exits try logging in ")
-        return 111
-    else:
-        c.execute("INSERT INTO accounts VALUES (NULL, ?, ?, ?, ?);", (name, email,username, password))
-        conn.commit()
-        print("Accout registered!")
-        return 100
-
-def authenticate(username, password):
-    c.execute("SELECT username FROM accounts WHERE username=?", (username,))
-    result = c.fetchone()
-    if not result:
-        print("User not found")
-        return 104
-    else:
-         c.execute("SELECT username, password FROM accounts WHERE username=? AND password=?", (username,password))
-         result = c.fetchone()
-         if not result:
-             print("wrong password!")
-             return 102
-         else:
-            print("Login succesful")
-            return 100
-        
-    
 
 
-conn.close()
