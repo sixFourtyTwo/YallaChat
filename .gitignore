@@ -1,2 +1,4 @@
 server/infrastructure/__pycache__/
-client/infrastructure/__pycache__/s
+client/infrastructure/__pycache__/
+client/__pycache__/
+server/__pycache__/
