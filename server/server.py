@@ -14,13 +14,9 @@ def handler(conn, addr):
     currentUser = None
     while True:
         try:
-            print('mark pre')
-            if(conn.recv(1024).decode('utf-8') == 0):
-                print('wallahi im finished')
-                break
-            print('mark post')
-
             message = conn.recv(1024).decode('utf-8').split()
+            if message == []:
+                continue
             print(message)
             cmnd = message[0]
             if(cmnd == 'LOGIN'): 
@@ -35,6 +31,7 @@ def handler(conn, addr):
                 name, email, username, password = message[1], message[2], message[3], message[4]
                 reply = Sfunc.register_account(db_conn, cursor, name, email, username, password)
                 print('are we sending?')
+                print(reply)
                 conn.send(reply.encode())
 
                 onlineUsers.update({username:username})
