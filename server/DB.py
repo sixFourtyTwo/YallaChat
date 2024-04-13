@@ -78,12 +78,13 @@ def get_userID(c, username):
     c.execute("SELECT user_id FROM accounts WHERE username=?", (username,))
     result = c.fetchone()
     if result:
-        return result
+        return result[0]
 
 def send_friend_request(conn, c, sender_id, receiver_id):
     c.execute('''INSERT INTO friend_requests (sender_id, receiver_id) VALUES (?, ?)''', (sender_id, receiver_id))
     conn.commit()
     conn.close()
+    print("friend request sent")
 
 def accept_friend_request(conn, c, request_id):
 
@@ -102,3 +103,7 @@ def get_pending_friend_requests(conn, c, user_id):
     conn.close()
     return requests
 
+conn, c = connect_to_database()
+Sfunc.register_account(conn, c, "dani", "dani@edu", "dani123", "123456")
+Sfunc.register_account(conn, c, "dani2", "dani2@edu", "dani1223", "1234256")
+send_friend_request(conn, c, get_userID(c,'dani123'), get_userID(c,'dani1223'))
