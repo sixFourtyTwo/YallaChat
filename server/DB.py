@@ -55,6 +55,12 @@ def get_user_chats(username):
     conn.close()
 
     return chats
+def lookup_user(c, username):
+    c.execute("SELECT username FROM accounts WHERE username=?", (username,))
+    result = c.fetchone()
+    if result:
+        return True
+    else: False
 
 conn, c = connect_to_database()
 create_accounts(c)
