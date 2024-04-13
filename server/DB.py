@@ -4,6 +4,7 @@ import os
 def connect_to_database():
     conn = sqlite3.connect("accounts.db")
     c = conn.cursor()
+    create_chats(c)
     return conn, c
 def create_accounts(c):
     c.execute('''CREATE TABLE IF NOT EXISTS accounts(user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -13,7 +14,7 @@ def create_accounts(c):
              password TEXT);
            ''')
 def create_chats(c):
-    c.execute('''CREATE TABLE Chats (
+    c.execute('''CREATE TABLE IF NOT EXISTs Chats (
     chat_id INTEGER PRIMARY KEY,
     sender_id INTEGER NOT NULL,
     receiver_id INTEGER NOT NULL,
@@ -23,8 +24,8 @@ def create_chats(c):
     FOREIGN KEY (receiver_id) REFERENCES Users(user_id)
 );''')
 def create_messages(c):
-    c.execute('''CREATE TABLE message (
-	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    c.execute('''CREATE IF NOT EXIST TABLE message (
+	id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
 	sender_id INT NOT NULL,
 	receiver_id INT NOT NULL,
 	message TEXT,
@@ -42,9 +43,10 @@ def fetch_messages(cursor, chat_id):
         messages = cursor.fetchall()
         return messages
 conn, c = connect_to_database()
-create_messages(c)
+create_accounts(c)
+create_chats(c)
 
-    
+conn.close()   
     
 
 
