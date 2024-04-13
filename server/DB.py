@@ -34,6 +34,18 @@ def create_messages(c):
 	FOREIGN KEY (sender_id) REFERENCES users(id),
 	FOREIGN KEY (receiver_id) REFERENCES users(id)
 );''')
+    
+def create_friends(c):
+    c.execute('''CREATE TABLE IF NOT EXISTS friend_requests (
+    request_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sender_id INTEGER,
+    receiver_id INTEGER,
+    status TEXT DEFAULT 'pending',
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES accounts(user_id),
+    FOREIGN KEY (receiver_id) REFERENCES accounts(user_id)
+);
+''')
 
 def get_user_chats(username):
     # Connect to the SQLite database
@@ -60,14 +72,33 @@ def lookup_user(c, username):
     result = c.fetchone()
     if result:
         return True
-    else: False
+    else: 
+        return False
+def get_userID(c, username):
+    c.execute("SELECT user_id FROM accounts WHERE username=?", (username,))
+    result = c.fetchone()
+    if result:
+        return result
 
-conn, c = connect_to_database()
-create_accounts(c)
-create_chats(c)
+def send_friend_request(conn, c, sender_id, receiver_id):
+    c.execute('''INSERT INTO friend_requests (sender_id, receiver_id) VALUES (?, ?)''', (sender_id, receiver_id))
+    conn.commit()
+    conn.close()
 
-chats = get_user_chats('sfefefe')
-print(chats)
+def accept_friend_request(conn, c, request_id):
 
-conn.close()   
+    c.execute('''UPDATE friend_requests SET status = 'accepted' WHERE request_id = ?''', (request_id,))
+    conn.commit()
+    conn.close()
+
+def reject_friend_request(conn, c, request_id):
+    c.execute('''UPDATE friend_requests SET status = 'rejected' WHERE request_id = ?''', (request_id,))
+    conn.commit()
+    conn.close()
+
+def get_pending_friend_requests(conn, c, user_id):
+    c.execute('''SELECT * FROM friend_requests WHERE receiver_id = ? AND status = 'pending' ''', (user_id,))
+    requests = c.fetchall()
+    conn.close()
+    return requests
 
