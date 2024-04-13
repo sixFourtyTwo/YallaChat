@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import infrastructure.Sfunctions as Sfunc
 
 def connect_to_database():
     conn = sqlite3.connect("accounts.db")
@@ -15,13 +16,13 @@ def create_accounts(c):
            ''')
 def create_chats(c):
     c.execute('''CREATE TABLE IF NOT EXISTs Chats (
-    chat_id INTEGER PRIMARY KEY,
+    chat_id INTEGER PRIMARY KEY AUTOINCREMENT,
     sender_id INTEGER NOT NULL,
     receiver_id INTEGER NOT NULL,
     last_message TEXT NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sender_id) REFERENCES Users(user_id),
-    FOREIGN KEY (receiver_id) REFERENCES Users(user_id)
+    FOREIGN KEY (sender_id) REFERENCES accounts(user_id),
+    FOREIGN KEY (receiver_id) REFERENCES accounts(user_id)
 );''')
 def create_messages(c):
     c.execute('''CREATE IF NOT EXIST TABLE message (
@@ -34,17 +35,33 @@ def create_messages(c):
 	FOREIGN KEY (receiver_id) REFERENCES users(id)
 );''')
 
-def fetch_chats(cursor):
-        cursor.execute('''SELECT id, participant1, participant2 FROM chats''')
-        chats = cursor.fetchall()
-        return chats
-def fetch_messages(cursor, chat_id):
-        messages = cursor.execute("SELECT sender, content, timestamp FROM messages WHERE chat_id = ? ORDER BY timestamp", (chat_id,))
-        messages = cursor.fetchall()
-        return messages
+def get_user_chats(username):
+    # Connect to the SQLite database
+    conn, c = connect_to_database()
+    # Execute the SQL query to retrieve chats
+    c.execute('''SELECT Chats.*, sender.name AS sender_name, receiver.name AS receiver_name
+                 FROM Chats
+                 JOIN accounts AS sender ON Chats.sender_id = sender.user_id
+                 JOIN accounts AS receiver ON Chats.receiver_id = receiver.user_id
+                 WHERE sender.username = ? OR receiver.username = ?
+                 ORDER BY Chats.timestamp''', (username, username))
+
+
+    # Fetch all rows
+    chats = c.fetchall()
+
+    # Close the cursor and connection
+    c.close()
+    conn.close()
+
+    return chats
+
 conn, c = connect_to_database()
 create_accounts(c)
 create_chats(c)
+
+chats = get_user_chats('sfefefe')
+print(chats)
 
 conn.close()   
 
