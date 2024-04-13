@@ -67,6 +67,7 @@ def get_user_chats(username):
     conn.close()
 
     return chats
+#helper functions for general use
 def lookup_user(c, username):
     c.execute("SELECT username FROM accounts WHERE username=?", (username,))
     result = c.fetchone()
@@ -79,6 +80,13 @@ def get_userID(c, username):
     result = c.fetchone()
     if result:
         return result[0]
+def find_request_id(conn, c, sender_id, receiver_id):
+    c.execute('''SELECT request_id
+                 FROM friend_requests
+                 WHERE sender_id = ? AND receiver_id = ?''', (sender_id, receiver_id))
+    request_id = c.fetchone()
+    conn.close()
+    return request_id[0]
 
 def send_friend_request(conn, c, sender_id, receiver_id):
     c.execute('''INSERT INTO friend_requests (sender_id, receiver_id) VALUES (?, ?)''', (sender_id, receiver_id))
