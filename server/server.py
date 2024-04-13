@@ -34,6 +34,12 @@ def handler(conn, addr):
                 if (user not in onlineUsers):
                     reply = 'OFFLINE'
                 else: reply = 'ONLINE'
+                if(not DB.lookup_user(cursor, user)):
+                    reply = 'User does not exist.'
+                else:
+                    if (user not in onlineUsers):
+                        reply = 'OFFLINE'
+                    else: reply = 'ONLINE'
                 
                 conn.send(reply.encode('utf-8'))
 
@@ -51,7 +57,7 @@ def handler(conn, addr):
             if(currentUser != None):
                 onlineUsers.pop(currentUser)
                 break
-    print('User ' + username + ' has disconnected.')
+    print('User ' + username + ' has gracefully disconnected.')
             
 
 def Server():
