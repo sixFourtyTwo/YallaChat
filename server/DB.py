@@ -42,11 +42,9 @@ def fetch_messages(cursor, chat_id):
         messages = cursor.execute("SELECT sender, content, timestamp FROM messages WHERE chat_id = ? ORDER BY timestamp", (chat_id,))
         messages = cursor.fetchall()
         return messages
-conn, c = connect_to_database()
-create_accounts(c)
-create_chats(c)
 
-conn.close()   
+
+    
     
 
 
