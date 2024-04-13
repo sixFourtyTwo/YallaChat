@@ -37,6 +37,11 @@ def handler(conn, addr):
                 
                 conn.send(reply.encode('utf-8'))
 
+            elif(cmnd == 'ADDF'):
+                user = message[1]
+                Sfunc.addFriend(cursor, db_conn, currentUser, user)
+                return '100'
+
             elif(cmnd == 'DISCONNECT'):
                 if(currentUser != None):
                     onlineUsers.pop(currentUser)

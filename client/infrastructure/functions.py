@@ -23,6 +23,12 @@ def commandHandler(client, command):
     elif(command == 'help'):
         print('Commands: login, register, onlinecheck, help :D')
 
+def addFriend(client, username):
+    message = 'ADDF ' + username
+    client.send(message.encode('utf-8'))
+    
+    return codeHandler(client.recv(1024).decode('utf-8'))
+
 def collectLogin(client):
     uname = input('Username: ')
     password = input('Password: ')

@@ -1,4 +1,5 @@
 import sqlite3
+import DB
 
 def register_account(conn,c,name, email, username, password):
     c.execute("SELECT username FROM accounts WHERE username=?", (username,))
@@ -11,6 +12,13 @@ def register_account(conn,c,name, email, username, password):
         conn.commit()
         print("Accout registered!")
         return '100'
+    
+def addFriend(c, conn, user, other):
+    userID1 = DB.get_userID(user)
+    userID2 = DB.get_userID(other)
+
+    DB.send_friend_request(conn, c, userID1, userID2)
+    return
 
 def authenticate(c,username, password):
     c.execute("SELECT username FROM accounts WHERE username=?", (username,))
