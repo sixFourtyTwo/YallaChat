@@ -21,6 +21,21 @@ def login(server, message, cursor):
 
     return username
 
+def acceptFR(server, c, conn, user, other):
+
+    userID = DB.get_userID(c, user)
+    otherID = DB.get_userID(c, other)
+
+    reqID = DB.find_request_id(c, otherID, userID)
+    DB.accept_friend_request(conn, c, reqID)
+
+    server.send(user + ' is now your friend!')
+
+def dispFriends(server, c, user):
+    userID = DB.get_userID(c, user)
+    friends = DB.get_friends(c, userID)
+    server.send(str(friends).encode('utf-8'))
+
 def getPendingFR(server, c, user):
     userID = DB.get_userID(c, user)
     list = DB.get_pending_friend_requests(c, userID)

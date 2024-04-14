@@ -105,6 +105,7 @@ def get_username(c, user_ID):
     result = c.fetchone()
     if result:
         return result[0]
+    
 def find_request_id(c, sender_id, receiver_id):
     c.execute('''SELECT request_id
                  FROM friend_requests
@@ -140,6 +141,7 @@ def get_friends(c, user_id):
               (user_id, user_id, user_id))
     friends = c.fetchall()
     return friends
+
 def send_message(conn, c, sender_id, receiver_id, message):
     c.execute('''INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)''', (sender_id, receiver_id, message))
     conn.commit()

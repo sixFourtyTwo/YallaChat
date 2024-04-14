@@ -36,9 +36,37 @@ def addFriend(client):
     print(client.recv(1024).decode('utf-8'))
     return
 
+def dispFriendRequests(client):
+    friendReqs = getPendingFR(client)
+
+    print('Incoming Friend Requests: ')
+    friends = friendReqs.split(',')
+
+    for friend in friends:
+        print('-') + friend
+
 def getPendingFR(client):
     client.send('GPFR'.encode('utf-8'))
     print(client.recv(1024).decode('utf-8'))
+
+#def dispFriends(client):
+#
+#
+
+def acceptFR(client, user):
+    friendReqs = getPendingFR(client)
+    friends = friendReqs.split(',')
+    other = None
+
+    for friend in friends:
+        if(user == friend):
+            other = friend
+            break
+    if(other == None):
+        print('\'' + user + '\' does not exist in your pending friend requests.')
+        return
+    message = 'AcFR ' + other
+    print(client.send(message.encode('utf-8')))
 
 def collectLogin(client):
     uname = input('Username: ')
