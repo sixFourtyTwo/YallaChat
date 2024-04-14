@@ -49,10 +49,14 @@ def handler(conn, addr):
                     
                     conn.send(reply.encode('utf-8'))
 
+                elif(cmnd == 'GPFR'):
+                    Sfunc.getPendingFR(conn, cursor, db_conn, currentUser)
+
                 elif(cmnd == 'ADDF'):
                     user = message[1]
-                    Sfunc.addFriend(cursor, db_conn, currentUser, user)
-                    return '100'
+                    reply = Sfunc.addFriend(cursor, db_conn, currentUser, user)
+                    conn.send(reply.encode('utf-8'))
+
 
                 elif(cmnd == 'DISCONNECT'):
                     if(currentUser != None):

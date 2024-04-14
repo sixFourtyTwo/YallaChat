@@ -21,13 +21,23 @@ def commandHandler(client, command):
     elif(command == 'onlinecheck'):
         isOnlineCollector(client)
     elif(command == 'help'):
-        print('Commands: login, register, onlinecheck, help :D')
+        print('Commands: login, register, onlinecheck, add friend, help :D')
+    elif(command == 'add friend'):
+        addFriend(client)
+    elif(command == 'fetch requests'):
+        getPendingFR(client)
 
-def addFriend(client, username):
+
+def addFriend(client):
+    username = input('Username: ')
     message = 'ADDF ' + username
     client.send(message.encode('utf-8'))
     
-    return codeHandler(client.recv(1024).decode('utf-8'))
+    print(client.recv(1024).decode('utf-8'))
+    return
+
+def getPendingFR(client):
+    client.send('GPFR'.encode('utf-8'))
 
 def collectLogin(client):
     uname = input('Username: ')
