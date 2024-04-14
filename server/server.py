@@ -19,45 +19,51 @@ def handler(conn, addr):
                 raise ConnectionResetError
         
             cmnd = message[0]
-            if(cmnd == 'LOGIN'): 
-                username = Sfunc.login(conn, message, cursor)
-                onlineUsers.update({username:username})
-                currentUser = username
+            if(currentUser == None):
 
-            elif(cmnd == "REGISTER"):
-                username = Sfunc.register(conn, message, cursor, db_conn)
-                onlineUsers.update({username:username})
-                currentUser = username
+                if(cmnd == 'LOGIN'): 
+                    username = Sfunc.login(conn, message, cursor)
+                    onlineUsers.update({username:username})
+                    currentUser = username
 
-            elif(cmnd == 'IOnline'):
-                user = message[1]
-                if (user not in onlineUsers):
-                    reply = 'OFFLINE'
-                else: reply = 'ONLINE'
-                if(not DB.lookup_user(cursor, user)):
-                    reply = 'User does not exist.'
+                elif(cmnd == "REGISTER"):
+                    username = Sfunc.register(conn, message, cursor, db_conn)
+                    onlineUsers.update({username:username})
+                    currentUser = username
+                
                 else:
+                    reply = 'Please login or register before using this command.'
+                    conn.send(reply.encode('utf-8'))
+            else:
+                if(cmnd == 'IOnline'):
+                    user = message[1]
                     if (user not in onlineUsers):
                         reply = 'OFFLINE'
                     else: reply = 'ONLINE'
-                
-                conn.send(reply.encode('utf-8'))
+                    if(not DB.lookup_user(cursor, user)):
+                        reply = 'User does not exist.'
+                    else:
+                        if (user not in onlineUsers):
+                            reply = 'OFFLINE'
+                        else: reply = 'ONLINE'
+                    
+                    conn.send(reply.encode('utf-8'))
 
-            elif(cmnd == 'ADDF'):
-                user = message[1]
-                Sfunc.addFriend(cursor, db_conn, currentUser, user)
-                return '100'
+                elif(cmnd == 'ADDF'):
+                    user = message[1]
+                    Sfunc.addFriend(cursor, db_conn, currentUser, user)
+                    return '100'
 
-            elif(cmnd == 'DISCONNECT'):
-                if(currentUser != None):
-                    onlineUsers.pop(currentUser)
+                elif(cmnd == 'DISCONNECT'):
+                    if(currentUser != None):
+                        onlineUsers.pop(currentUser)
+                        break
                     break
-                break
         except (ConnectionResetError, ConnectionAbortedError): 
             if(currentUser != None):
                 onlineUsers.pop(currentUser)
                 break
-    print('User ' + username + ' has gracefully disconnected.')
+    print('User ' + currentUser + ' has gracefully disconnected.')
             
 
 def Server():

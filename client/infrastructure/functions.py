@@ -87,3 +87,5 @@ def codeHandler(code):
         return 'Login Successful.'
     elif(code == '111'):
         return 'User already exits, try loggin in.'
+    elif(code == '120'):
+        return 'Please login first.'
