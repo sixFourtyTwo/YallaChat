@@ -105,7 +105,7 @@ def get_username(c, user_ID):
     result = c.fetchone()
     if result:
         return result[0]
-def find_request_id(conn, c, sender_id, receiver_id):
+def find_request_id(c, sender_id, receiver_id):
     c.execute('''SELECT request_id
                  FROM friend_requests
                  WHERE sender_id = ? AND receiver_id = ?''', (sender_id, receiver_id))
