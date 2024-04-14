@@ -29,13 +29,25 @@ def acceptFR(server, c, conn, user, other):
     reqID = DB.find_request_id(c, otherID, userID)
     DB.accept_friend_request(conn, c, reqID)
 
-    reply = user + ' is now your friend!'
+    reply = other + ' is now your friend!'
     server.send(reply.encode('utf-8'))
 
-def dispFriends(server, c, user):
+def getFriends(server, c, user):
     userID = DB.get_userID(c, user)
     friends = DB.get_friends(c, userID)
-    server.send(str(friends).encode('utf-8'))
+
+    if(len(friends) == 0):
+        reply = 'none'
+
+    else:
+        reply = ''
+
+        for i in range(0, len(friends)):
+            reply = reply + friends[i][1] + ','
+        
+        reply = reply.rstrip(reply[-1])
+
+    server.send(reply.encode('utf-8'))
 
 def getPendingFR(server, c, user):
     userID = DB.get_userID(c, user)
@@ -45,15 +57,15 @@ def getPendingFR(server, c, user):
         reply = 'none'
     
     else:
-
         reply = ''
 
         for i in range(0, len(list)):
             reply = reply + str(DB.get_username(c, list[i][1])) + ','
         
         reply = reply.rstrip(reply[-1])
-        
+
     server.send(reply.encode('utf-8'))
+
 
 def register(server, message, cursor, db_conn):
     name, email, username, password = message[1], message[2], message[3], message[4]

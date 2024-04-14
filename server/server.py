@@ -52,6 +52,9 @@ def handler(conn, addr):
                 elif(cmnd == 'GPFR'):
                     Sfunc.getPendingFR(conn, cursor, currentUser)
 
+                elif(cmnd == 'GETF'):
+                    Sfunc.getFriends(conn, cursor, currentUser)
+
                 elif(cmnd == 'AcFR'):
                     user = message[1]
                     Sfunc.acceptFR(conn, cursor, db_conn, currentUser, user)
@@ -60,7 +63,6 @@ def handler(conn, addr):
                     user = message[1]
                     reply = Sfunc.addFriend(cursor, db_conn, currentUser, user)
                     conn.send(reply.encode('utf-8'))
-
 
                 elif(cmnd == 'DISCONNECT'):
                     if(currentUser != None):

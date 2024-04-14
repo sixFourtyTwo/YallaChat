@@ -26,6 +26,8 @@ def commandHandler(client, command):
         addFriend(client)
     elif(command == 'fetch requests'):
         dispFriendRequests(client)
+    elif(command == 'fetch friends'):
+        dispFriends(client)
     elif(command == 'accept pending'):
         acceptFR(client)
 
@@ -42,7 +44,7 @@ def dispFriendRequests(client):
     friendReqs = getPendingFR(client)
 
     if(friendReqs == 'none'):
-        print('You have no pending friend requests. (Noob).')
+        print('You have no pending friend requests. (noob)')
         return
 
     print('Incoming Friend Requests: ')
@@ -51,13 +53,26 @@ def dispFriendRequests(client):
     for friend in friends:
         print('-' + friend)
 
+def dispFriends(client):
+    friendsList = getFriends(client)
+
+    if(friendsList == 'none'):
+        print('You have no friends. (noob)')
+        return
+    
+    print('Friends: ')
+    friends = friendsList.split(',')
+
+    for friend in friends:
+        print('-' + friend)
+
+def getFriends(client):
+    client.send('GETF'.encode('utf-8'))
+    return client.recv(1024).decode('utf-8')
+
 def getPendingFR(client):
     client.send('GPFR'.encode('utf-8'))
     return client.recv(1024).decode('utf-8')
-
-#def dispFriends(client):
-#
-#
 
 def acceptFR(client):
     friendReqs = getPendingFR(client)
