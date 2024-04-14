@@ -101,6 +101,11 @@ def get_userID(c, username):
     result = c.fetchone()
     if result:
         return result[0]
+def get_username(c, user_ID):
+    c.execute("SELECT username FROM accounts WHERE user_id=?", (user_ID,))
+    result = c.fetchone()
+    if result:
+        return result[0]
 def find_request_id(conn, c, sender_id, receiver_id):
     c.execute('''SELECT request_id
                  FROM friend_requests
