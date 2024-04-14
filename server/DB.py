@@ -74,7 +74,7 @@ def register_account(conn,c,name, email, username, password):
         return '100'
     
 
-def get_user_chats(conn, c, username):
+def get_user_chats(c, username):
     # Connect to the SQLite database
     # Execute the SQL query to retrieve chats
     c.execute('''SELECT Chats.*, sender.name AS sender_name, receiver.name AS receiver_name
