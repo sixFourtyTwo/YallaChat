@@ -130,6 +130,16 @@ def get_pending_friend_requests(c, user_id):
     c.execute('''SELECT * FROM friend_requests WHERE receiver_id = ? AND status = 'pending' ''', (user_id,))
     requests = c.fetchall()
     return requests
+
+def get_friends(c, user_id):
+    c.execute('''SELECT accounts.user_id, accounts.username
+                 FROM friend_requests
+                 JOIN accounts ON (friend_requests.sender_id = accounts.user_id OR friend_requests.receiver_id = accounts.user_id)
+                 WHERE (friend_requests.sender_id = ? OR friend_requests.receiver_id = ?)
+                 AND friend_requests.status = 'accepted' AND accounts.user_id != ?''',
+              (user_id, user_id, user_id))
+    friends = c.fetchall()
+    return friends
 def send_message(conn, c, sender_id, receiver_id, message):
     c.execute('''INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)''', (sender_id, receiver_id, message))
     conn.commit()
