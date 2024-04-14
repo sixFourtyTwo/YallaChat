@@ -25,7 +25,9 @@ def commandHandler(client, command):
     elif(command == 'add friend'):
         addFriend(client)
     elif(command == 'fetch requests'):
-        getPendingFR(client)
+        dispFriendRequests(client)
+    elif(command == 'accept pending'):
+        acceptFR(client)
 
 
 def addFriend(client):
@@ -39,24 +41,30 @@ def addFriend(client):
 def dispFriendRequests(client):
     friendReqs = getPendingFR(client)
 
+    if(friendReqs == 'none'):
+        print('You have no pending friend requests. (Noob).')
+        return
+
     print('Incoming Friend Requests: ')
     friends = friendReqs.split(',')
 
     for friend in friends:
-        print('-') + friend
+        print('-' + friend)
 
 def getPendingFR(client):
     client.send('GPFR'.encode('utf-8'))
-    print(client.recv(1024).decode('utf-8'))
+    return client.recv(1024).decode('utf-8')
 
 #def dispFriends(client):
 #
 #
 
-def acceptFR(client, user):
+def acceptFR(client):
     friendReqs = getPendingFR(client)
     friends = friendReqs.split(',')
     other = None
+
+    user = input('Username: ')
 
     for friend in friends:
         if(user == friend):
@@ -66,7 +74,9 @@ def acceptFR(client, user):
         print('\'' + user + '\' does not exist in your pending friend requests.')
         return
     message = 'AcFR ' + other
-    print(client.send(message.encode('utf-8')))
+    client.send(message.encode('utf-8'))
+
+    print(client.recv(1024).decode('utf-8'))
 
 def collectLogin(client):
     uname = input('Username: ')
