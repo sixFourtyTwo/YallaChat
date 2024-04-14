@@ -30,8 +30,8 @@ def create_messages(c):
     receiver_id INTEGER,
     message TEXT,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sender_id) REFERENCES users(user_id),
-    FOREIGN KEY (receiver_id) REFERENCES users(user_id)
+    FOREIGN KEY (sender_id) REFERENCES accounts(user_id),
+    FOREIGN KEY (receiver_id) REFERENCES accounts(user_id)
 );''')
     
 def create_friends(c):
