@@ -84,8 +84,6 @@ def get_user_chats(conn, c, username):
                  WHERE sender.username = ? OR receiver.username = ?
                  ORDER BY Chats.timestamp''', (username, username))
     chats = c.fetchall()
-    c.close()
-    conn.close()
     return chats
 
 #helper functions for general use
@@ -101,6 +99,7 @@ def get_userID(c, username):
     result = c.fetchone()
     if result:
         return result[0]
+    
 def get_username(c, user_ID):
     c.execute("SELECT username FROM accounts WHERE user_id=?", (user_ID,))
     result = c.fetchone()
@@ -111,36 +110,30 @@ def find_request_id(conn, c, sender_id, receiver_id):
                  FROM friend_requests
                  WHERE sender_id = ? AND receiver_id = ?''', (sender_id, receiver_id))
     request_id = c.fetchone()
-    conn.close()
     return request_id[0]
 
 def send_friend_request(conn, c, sender_id, receiver_id):
     c.execute('''INSERT INTO friend_requests (sender_id, receiver_id) VALUES (?, ?)''', (sender_id, receiver_id))
     conn.commit()
-    conn.close()
     print("friend request sent")
 
 def accept_friend_request(conn, c, request_id):
 
     c.execute('''UPDATE friend_requests SET status = 'accepted' WHERE request_id = ?''', (request_id,))
     conn.commit()
-    conn.close()
 
 def reject_friend_request(conn, c, request_id):
     c.execute('''UPDATE friend_requests SET status = 'rejected' WHERE request_id = ?''', (request_id,))
     conn.commit()
-    conn.close()
 
-def get_pending_friend_requests(conn, c, user_id):
+def get_pending_friend_requests(c, user_id):
     c.execute('''SELECT * FROM friend_requests WHERE receiver_id = ? AND status = 'pending' ''', (user_id,))
     requests = c.fetchall()
-    conn.close()
     return requests
 def send_message(conn, c, sender_id, receiver_id, message):
     c.execute('''INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)''', (sender_id, receiver_id, message))
     conn.commit()
-def get_messages(conn, c, user_id1, user_id2):
+def get_messages(c, user_id1, user_id2):
     c.execute('''SELECT * FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp''', (user_id1, user_id2, user_id2, user_id1))
     messages = c.fetchall()
-    conn.close()
     return messages
