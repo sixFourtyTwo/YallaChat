@@ -29,7 +29,7 @@ def getPendingFR(server, c, user):
     for i in range(0, len(list)):
         reply = reply + str(DB.get_username(c, list[i][1])) + ','
     
-    reply.rstrip(reply[-1])
+    reply = reply.rstrip(reply[-1])
     server.send(reply.encode('utf-8'))
 
 def register(server, message, cursor, db_conn):
