@@ -50,7 +50,7 @@ def handler(conn, addr):
                     conn.send(reply.encode('utf-8'))
 
                 elif(cmnd == 'GPFR'):
-                    Sfunc.getPendingFR(conn, cursor, db_conn, currentUser)
+                    Sfunc.getPendingFR(conn, cursor, currentUser)
 
                 elif(cmnd == 'ADDF'):
                     user = message[1]

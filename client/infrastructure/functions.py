@@ -38,6 +38,7 @@ def addFriend(client):
 
 def getPendingFR(client):
     client.send('GPFR'.encode('utf-8'))
+    print(client.recv(1024).decode('utf-8'))
 
 def collectLogin(client):
     uname = input('Username: ')

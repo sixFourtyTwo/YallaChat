@@ -21,11 +21,16 @@ def login(server, message, cursor):
 
     return username
 
-def getPendingFR(server, c, conn, user):
+def getPendingFR(server, c, user):
     userID = DB.get_userID(c, user)
-    reply = DB.get_pending_friend_requests(conn, c, userID)
-    server.send(str(reply).encode('utf-8'))
-    print(str(reply))
+    list = DB.get_pending_friend_requests(c, userID)
+    reply = ''
+
+    for i in range(0, len(list)):
+        reply = reply + str(DB.get_username(c, list[i][1])) + ','
+    
+    reply.rstrip(reply[-1])
+    server.send(reply.encode('utf-8'))
 
 def register(server, message, cursor, db_conn):
     name, email, username, password = message[1], message[2], message[3], message[4]
