@@ -44,7 +44,7 @@ def dispFriendRequests(client):
     friendReqs = getPendingFR(client)
 
     if(friendReqs == 'none'):
-        print('You have no pending friend requests. (noob)')
+        print('You have no pending friend requests.')
         return
 
     print('Incoming Friend Requests: ')
@@ -57,7 +57,7 @@ def dispFriends(client):
     friendsList = getFriends(client)
 
     if(friendsList == 'none'):
-        print('You have no friends. (noob)')
+        print('You have no friends.')
         return
     
     print('Friends: ')
