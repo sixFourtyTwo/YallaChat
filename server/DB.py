@@ -134,15 +134,8 @@ def get_pending_friend_requests(conn, c, user_id):
 def send_message(conn, c, sender_id, receiver_id, message):
     c.execute('''INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)''', (sender_id, receiver_id, message))
     conn.commit()
-    conn.close()
-
 def get_messages(conn, c, user_id1, user_id2):
     c.execute('''SELECT * FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp''', (user_id1, user_id2, user_id2, user_id1))
     messages = c.fetchall()
     conn.close()
     return messages
-
-conn, c = connect_to_database()
-register_account(conn, c, "dani", "dani@edu", "dani123", "123456")
-register_account(conn, c, "dani2", "dani2@edu", "dani1223", "1234256")
-send_friend_request(conn, c, get_userID(c,'dani123'), get_userID(c,'dani1223'))
