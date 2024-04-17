@@ -73,7 +73,17 @@ def register_account(conn,c,name, email, username, password):
         print("Accout registered!")
         return '100'
     
-
+def check_chat_exists(c, sender_id, receiver_id):
+        # Query the Chats table to check if a chat exists between the specified users
+        c.execute('''SELECT * FROM Chats 
+                          WHERE (sender_id = ? AND receiver_id = ?) 
+                          OR (sender_id = ? AND receiver_id = ?)''', 
+                       (sender_id, receiver_id, receiver_id, sender_id))
+        result = c.fetchone()
+        if result:
+            return True
+        else: 
+            return False
 def get_user_chats(c, username):
     # Connect to the SQLite database
     # Execute the SQL query to retrieve chats
@@ -85,6 +95,11 @@ def get_user_chats(c, username):
                  ORDER BY Chats.timestamp''', (username, username))
     chats = c.fetchall()
     return chats
+
+def start_chat(conn, c, sender_id, receiver_id, initial_message):
+    c.execute('''INSERT INTO Chats (sender_id, receiver_id, last_message) 
+                          VALUES (?, ?, ?)''', (sender_id, receiver_id, initial_message))
+    conn.commit()
 
 #helper functions for general use
 def lookup_user(c, username):
