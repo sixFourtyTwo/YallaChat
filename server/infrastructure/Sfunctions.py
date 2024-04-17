@@ -94,7 +94,8 @@ def recvMessages(server, conn, c, user):
     else:
         reply = ''
         for msg in messages:
-            reply = reply + msg[2] + '///'
+            other = DB.get_username(c, msg[1])
+            reply = reply + other + ': ' + msg[2] + '///'
             
         reply = reply.rstrip(reply[-1])
     server.send(reply.encode('utf-8'))
