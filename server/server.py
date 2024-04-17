@@ -54,8 +54,6 @@ def handler(conn, addr):
                     msg = message[2:]
                     msg = ' '.join(msg)
 
-                    print(msg)
-
                     Sfunc.sendMessage(conn, db_conn, cursor, currentUser, user, msg)
 
                 elif(cmnd == 'RcvMsg'):
@@ -90,13 +88,13 @@ def handler(conn, addr):
                 onlineUsers.pop(currentUser)
                 break
     print('User ' + currentUser + ' has gracefully disconnected.')
-            
+
 
 def Server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((socket.gethostbyname(socket.gethostname()), port))
 
-    localIP = str(socket.gethostbyname(socket.gethostname()))
+    localIP = socket.gethostbyname(socket.gethostname())
     localPort = str(port)
     print('Server is now online on IP: ' + localIP + ' and port: ' +localPort)
     
