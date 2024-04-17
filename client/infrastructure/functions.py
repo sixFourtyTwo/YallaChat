@@ -5,7 +5,7 @@ def connect(client):
     IP = input('Enter IP: ')
     for j in range(12):
         try:
-            client.connect((socket.gethostbyname(socket.gethostname()), 9999))
+            client.connect(IP, 9999)
             print('Connection achieved.')
             return
         except:
