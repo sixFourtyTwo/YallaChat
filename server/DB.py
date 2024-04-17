@@ -1,5 +1,4 @@
 import sqlite3
-import os
 
 def connect_to_database():
     conn = sqlite3.connect("accounts.db")
@@ -120,7 +119,11 @@ def get_username(c, user_ID):
     result = c.fetchone()
     if result:
         return result[0]
-    
+def get_users(c):
+    c.execute("SELECT username FROM accounts")
+    result = c.fetchall()
+    return result
+
 def find_request_id(c, sender_id, receiver_id):
     c.execute('''SELECT request_id
                  FROM friend_requests
