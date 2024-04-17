@@ -183,3 +183,6 @@ def get_new_message(conn, c, user_id):
         conn.commit()
     
     return new_messages
+
+conn, cursor = connect_to_database()
+create_friends(cursor)
