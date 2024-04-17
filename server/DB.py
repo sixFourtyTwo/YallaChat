@@ -119,10 +119,12 @@ def get_username(c, user_ID):
     result = c.fetchone()
     if result:
         return result[0]
+    
 def get_users(c):
     c.execute("SELECT username FROM accounts")
     result = c.fetchall()
     return result
+
 
 def find_request_id(c, sender_id, receiver_id):
     c.execute('''SELECT request_id
@@ -131,24 +133,28 @@ def find_request_id(c, sender_id, receiver_id):
     request_id = c.fetchone()
     return request_id[0]
 
+
 def send_friend_request(conn, c, sender_id, receiver_id):
     c.execute('''INSERT INTO friend_requests (sender_id, receiver_id) VALUES (?, ?)''', (sender_id, receiver_id))
     conn.commit()
     print("friend request sent")
 
-def accept_friend_request(conn, c, request_id):
 
+def accept_friend_request(conn, c, request_id):
     c.execute('''UPDATE friend_requests SET status = 'accepted' WHERE request_id = ?''', (request_id,))
     conn.commit()
+
 
 def reject_friend_request(conn, c, request_id):
     c.execute('''UPDATE friend_requests SET status = 'rejected' WHERE request_id = ?''', (request_id,))
     conn.commit()
 
+
 def get_pending_friend_requests(c, user_id):
     c.execute('''SELECT * FROM friend_requests WHERE receiver_id = ? AND status = 'pending' ''', (user_id,))
     requests = c.fetchall()
     return requests
+
 
 def get_friends(c, user_id):
     c.execute('''SELECT accounts.user_id, accounts.username
@@ -170,10 +176,13 @@ def get_old_messages(c, user_id1, user_id2):
                  ORDER BY timestamp''', (user_id1, user_id2, user_id2, user_id1))
     messages = c.fetchall()
     return messages
-def get_new_message(conn, c, user_id):
+def get_new_message(conn, c, sender_id, receiver_id):
     c.execute('''SELECT message_id, sender_id, message 
                   FROM messages 
-                  WHERE receiver_id = ? AND seen = 0''', (user_id,))
+                  WHERE (sender_id = ? AND receiver_id = ?) 
+                  OR (sender_id = ? AND receiver_id = ?)
+                  AND seen = 0''', (sender_id, receiver_id, receiver_id, sender_id))
+     
     new_messages = c.fetchall()
     
     # Mark the fetched messages as seen
