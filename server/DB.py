@@ -146,17 +146,23 @@ def send_message(conn, c, sender_id, receiver_id, message):
     c.execute('''INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)''', (sender_id, receiver_id, message))
     conn.commit()
 def get_old_messages(c, user_id1, user_id2):
-    c.execute('''SELECT * FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) AND seen = 1 ORDER BY timestamp''', (user_id1, user_id2, user_id2, user_id1))
+    c.execute('''SELECT * FROM messages 
+                 WHERE ((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?))
+                 AND seen = 1 
+                 ORDER BY timestamp''', (user_id1, user_id2, user_id2, user_id1))
     messages = c.fetchall()
     return messages
-def get_new_message(c, user_id):
+def get_new_message(conn, c, user_id):
     c.execute('''SELECT message_id, sender_id, message 
-                      FROM messages 
-                      WHERE receiver_id = ? AND seen = 0''', (user_id,))
+                  FROM messages 
+                  WHERE receiver_id = ? AND seen = 0''', (user_id,))
     new_messages = c.fetchall()
     
     # Mark the fetched messages as seen
     for msg in new_messages:
-        c.execute('''UPDATE messages SET seen = 1 WHERE message_id = ?''', (msg[0],))
+        message_id = msg[0]
+        c.execute('''UPDATE messages SET seen = 1 WHERE message_id = ?''', (message_id,))
+        conn.commit()
     
     return new_messages
+
