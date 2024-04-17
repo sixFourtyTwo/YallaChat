@@ -30,7 +30,12 @@ def commandHandler(client, command):
         dispFriends(client)
     elif(command == 'accept pending'):
         acceptFR(client)
-
+    elif(command == 'reject pending'):
+        rejectFR(client)
+    elif(command == 'send message'):
+        sendMessage(client)
+    elif(command == 'disp message'):
+        getNewMsgs(client)
 
 def addFriend(client):
     username = input('Username: ')
@@ -57,7 +62,7 @@ def dispFriends(client):
     friendsList = getFriends(client)
 
     if(friendsList == 'none'):
-        print('You have no friends.')
+        print('You have no friends. ')
         return
     
     print('Friends: ')
@@ -89,6 +94,25 @@ def acceptFR(client):
         print('\'' + user + '\' does not exist in your pending friend requests.')
         return
     message = 'AcFR ' + other
+    client.send(message.encode('utf-8'))
+
+    print(client.recv(1024).decode('utf-8'))
+
+def rejectFR(client):
+    friendReqs = getPendingFR(client)
+    friends = friendReqs.split(',')
+    other = None
+
+    user = input('Username: ')
+
+    for friend in friends:
+        if(user == friend):
+            other = friend
+            break
+    if(other == None):
+        print('\'' + user + '\' does not exist in your pending friend requests.')
+        return
+    message = 'RjFR ' + other
     client.send(message.encode('utf-8'))
 
     print(client.recv(1024).decode('utf-8'))
@@ -139,6 +163,29 @@ def isOnline(client, user):
     client.send(message.encode('utf-8'))
 
     return client.recv(1024).decode('utf-8')
+
+def getNewMsgs(client):
+    client.send('RcvMsg'.encode('utf-8'))
+    messages = client.recv(1024).decode()
+
+    if(messages == '///'):
+        print('You have no new messages.')
+    else:
+        msgList = messages.split('///')
+        for msg in msgList:
+            print(msg)
+
+def getMessageInput():
+    message = input('Enter your message:')
+    return message
+
+def sendMessage(client):
+    user = input('Enter user: ')
+    uInput = getMessageInput()
+    message = 'SMsg ' + user + ' ' + uInput
+
+    client.send(message.encode('utf-8'))
+    print(client.recv(1024).decode('utf-8'))
 
 def codeHandler(code):
     if(code == '100'):

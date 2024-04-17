@@ -165,4 +165,3 @@ def get_new_message(conn, c, user_id):
         conn.commit()
     
     return new_messages
-

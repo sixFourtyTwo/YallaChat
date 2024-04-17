@@ -49,6 +49,18 @@ def handler(conn, addr):
                     
                     conn.send(reply.encode('utf-8'))
 
+                elif(cmnd == 'SMsg'):
+                    user = message[1]
+                    msg = message[2:]
+                    msg = ' '.join(msg)
+
+                    print(msg)
+
+                    Sfunc.sendMessage(conn, db_conn, cursor, currentUser, user, msg)
+
+                elif(cmnd == 'RcvMsg'):
+                    Sfunc.recvMessages(conn, db_conn, cursor, currentUser)
+
                 elif(cmnd == 'GPFR'):
                     Sfunc.getPendingFR(conn, cursor, currentUser)
 
@@ -58,6 +70,10 @@ def handler(conn, addr):
                 elif(cmnd == 'AcFR'):
                     user = message[1]
                     Sfunc.acceptFR(conn, cursor, db_conn, currentUser, user)
+
+                elif(cmnd == 'RjFR'):
+                    user = message[1]
+                    Sfunc.rejectFR(conn, cursor, db_conn, currentUser, user)
 
                 elif(cmnd == 'ADDF'):
                     user = message[1]
