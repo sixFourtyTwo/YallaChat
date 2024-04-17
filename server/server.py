@@ -96,7 +96,9 @@ def Server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((socket.gethostbyname(socket.gethostname()), port))
 
-    print('Server is now online.')
+    localIP = str(socket.gethostbyname(socket.gethostname()))
+    localPort = str(port)
+    print('Server is now online on IP: ' + localIP + ' and port: ' +localPort)
     
     try:
         server.listen()

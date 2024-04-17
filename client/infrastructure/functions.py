@@ -2,6 +2,7 @@ import socket
 import time
 
 def connect(client):
+    IP = input('Enter IP: ')
     for j in range(12):
         try:
             client.connect((socket.gethostbyname(socket.gethostname()), 9999))
