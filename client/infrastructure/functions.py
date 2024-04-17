@@ -37,6 +37,10 @@ def commandHandler(client, command):
         sendMessage(client)
     elif(command == 'disp message'):
         getNewMsgs(client)
+    elif(command == 'start chat'):
+        startChat(client)
+    elif(command == 'disp chats'):
+        dispChats(client)
 
 def addFriend(client):
     username = input('Username: ')
@@ -166,7 +170,10 @@ def isOnline(client, user):
     return client.recv(1024).decode('utf-8')
 
 def getNewMsgs(client):
-    client.send('RcvMsg'.encode('utf-8'))
+    other = input('Enter user: ')
+    toSend = 'RcvMsg ' + other
+
+    client.send(toSend.encode('utf-8'))
     messages = client.recv(1024).decode()
 
     if(messages == '///'):
@@ -177,7 +184,7 @@ def getNewMsgs(client):
             print(msg)
 
 def getMessageInput():
-    message = input('Enter your message:')
+    message = input('Enter your message: ')
     return message
 
 def sendMessage(client):
@@ -187,6 +194,22 @@ def sendMessage(client):
 
     client.send(message.encode('utf-8'))
     print(client.recv(1024).decode('utf-8'))
+
+def startChat(client):
+    user = input('Enter user: ')
+    uInput = getMessageInput()
+    message = 'StChat ' + user + ' ' + uInput
+
+    client.send(message.encode('utf-8'))
+    print(codeHandler(client.recv(1024).decode('utf-8')))
+
+def dispChats(client):
+    client.send('DispChats'.encode('utf-8'))
+    chats = client.recv(1024).decode('utf-8')
+    chatList = chats.split('///')
+
+    for chat in chatList:
+        print(chat)
 
 def codeHandler(code):
     if(code == '100'):

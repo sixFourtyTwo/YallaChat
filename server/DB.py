@@ -169,6 +169,7 @@ def get_friends(c, user_id):
 def send_message(conn, c, sender_id, receiver_id, message):
     c.execute('''INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)''', (sender_id, receiver_id, message))
     conn.commit()
+    
 def get_old_messages(c, user_id1, user_id2):
     c.execute('''SELECT * FROM messages 
                  WHERE ((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?))

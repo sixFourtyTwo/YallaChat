@@ -85,9 +85,38 @@ def sendMessage(server, conn, c, user, other, message):
     DB.send_message(conn, c, userID, otherID, message)
     server.send('Message sent!'.encode('utf-8'))
 
-def recvMessages(server, conn, c, user):
+def startChat(server, conn, cursor, user, other, message):
+    if(DB.lookup_user(cursor, other) == False):
+        reply = '104'
+    else:
+        userID = DB.get_userID(cursor, user)
+        otherID = DB.get_userID(cursor, other)
+
+        DB.start_chat(conn, cursor, userID, otherID, message)
+        reply = '100'
+    server.send(reply.encode('utf-8'))
+
+def getChats(server, c, user):
+    chats = DB.get_user_chats(c, user)
+    
+    reply = ''
+    for chat in chats:
+        user1 = DB.get_username(c, chat[1])
+        user2 = DB.get_username(c, chat[2])
+
+        if(user1 == user):
+            title = user2
+        elif(user2 == user):
+            title = user1
+        reply = reply + title + ': ' + chat[3] + '///'
+    
+    reply = reply.rstrip(reply[-1])
+    server.send(reply.encode('utf-8'))
+
+def recvMessages(server, conn, c, user, other):
     userID = DB.get_userID(c, user)
-    messages = DB.get_new_message(conn, c, userID)
+    otherID = DB.get_userID(c, other)
+    messages = DB.get_new_message(conn, c, otherID, userID)
 
     if(messages == []):
         reply = '///'
