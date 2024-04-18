@@ -135,7 +135,7 @@ def login(client, uname, password):
     client.send(message.encode('utf-8'))
 
     repCode = client.recv(1024).decode('utf-8')
-    return codeHandler(repCode)
+    print(repCode)
 
 def collectRegister(client):
     name = input('Enter your name: ')
@@ -159,7 +159,7 @@ def register(client, name, email, username, password):
     client.send(message.encode('utf-8'))
 
     repCode = client.recv(1024).decode('utf-8')
-    return codeHandler(repCode)
+    print(repCode)
 
 def isOnlineCollector(client):
     user = input('Who do you wish to check?: ')
@@ -223,8 +223,13 @@ def startChat(client):
 def dispChats(client):
     client.send('DispChats'.encode('utf-8'))
     chats = client.recv(1024).decode('utf-8')
-    chatList = chats.split('///')
 
+    if(chats == '///'):
+        chatList = []
+    else:
+        chatList = chats.split('///')
+
+    print(chatList)
     return chatList
 
 def codeHandler(code):

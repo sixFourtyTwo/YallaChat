@@ -5,7 +5,7 @@ import infrastructure.functions as funcs
 import socket 
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('192.168.56.1', 9999))
+client.connect(('192.20.30.211', 9999))
 
 class MainWindow(qtw.QWidget):
     def __init__(self):

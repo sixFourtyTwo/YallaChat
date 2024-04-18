@@ -22,9 +22,15 @@ def handler(conn, addr):
             if(currentUser == None):
 
                 if(cmnd == 'LOGIN'): 
-                    username = Sfunc.login(conn, message, cursor)
-                    onlineUsers.update({username:username})
-                    currentUser = username
+                    username = message[1]
+                    password = message[2:]
+                    password = ' '.join(password)
+
+                    dbCheck = Sfunc.login(conn, cursor, username, password)
+
+                    if(dbCheck != 'not found' and dbCheck != 'Wrong password.'):
+                        onlineUsers.update({username:username})
+                        currentUser = username
 
                 elif(cmnd == "REGISTER"):
                     username = Sfunc.register(conn, message, cursor, db_conn)
@@ -101,6 +107,9 @@ def handler(conn, addr):
                         onlineUsers.pop(currentUser)
                         break
                     break
+                else:
+                    conn.send('You are already logged in!'.encode('utf-8'))
+
         except (ConnectionResetError, ConnectionAbortedError): 
             if(currentUser != None):
                 onlineUsers.pop(currentUser)
