@@ -14,12 +14,15 @@ def addFriend(c, conn, user, other):
 
     return reply
         
-def login(server, message, cursor):
-    username, password = message[1], message[2]
-    reply = DB.authenticate(cursor,username, password)
+def login(server, cursor, username, password):
+    dbCheck = DB.authenticate(cursor, username, password)
+    if(dbCheck == 'not found'):
+        reply = 'User does not exist.'
+    else:
+        reply = dbCheck
     server.send(reply.encode())
 
-    return username
+    return dbCheck
 
 def acceptFR(server, c, conn, user, other):
     userID = DB.get_userID(c, user)
@@ -107,7 +110,7 @@ def checkChats(c, user, other):
 def getChats(server, c, user):
     chats = DB.get_user_chats(c, user)
     if(chats == []):
-                reply = '///'
+            reply = '///'
     else:
         reply = ''
         for chat in chats:
@@ -121,6 +124,9 @@ def getChats(server, c, user):
             reply = reply + title + ': ' + chat[3] + '///'
         
         reply = reply.rstrip(reply[-1])
+        reply = reply.rstrip(reply[-1])
+        reply = reply.rstrip(reply[-1])
+    print(reply)
     server.send(reply.encode('utf-8'))
 
 def recvOldMessages(server, c, user, other):

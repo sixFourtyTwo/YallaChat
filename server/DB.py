@@ -48,17 +48,14 @@ def authenticate(c,username, password):
     c.execute("SELECT username FROM accounts WHERE username=?", (username,))
     result = c.fetchone()
     if not result:
-        print("User not found")
-        return '104'
+        return 'not found'
     else:
          c.execute("SELECT username, password FROM accounts WHERE username=? AND password=?", (username,password))
          result = c.fetchone()
          if not result:
-             print("wrong password!")
-             return '102'
+            return 'Wrong password.'
          else:
-            print("Login succesful")
-            return '100'
+            return 'Login successful!'
          
 def register_account(conn,c,name, email, username, password):
     c.execute("SELECT username FROM accounts WHERE username=?", (username,))
