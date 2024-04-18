@@ -35,8 +35,10 @@ def commandHandler(client, command):
         rejectFR(client)
     elif(command == 'send message'):
         sendMessage(client)
-    elif(command == 'disp message'):
+    elif(command == 'disp messages'):
         getNewMsgs(client)
+    elif(command == 'disp old messages'):
+        getOldMsgs(client)
     elif(command == 'start chat'):
         startChat(client)
     elif(command == 'disp chats'):
@@ -183,6 +185,21 @@ def getNewMsgs(client):
         for msg in msgList:
             print(msg)
 
+def getOldMsgs(client):
+    other = input('User: ')
+    toSend = 'RcvOldMsg ' + other
+
+    client.send(toSend.encode('utf-8'))
+    messages = client.recv(1024).decode()
+
+    if(messages == '///'):
+        print('You have no messages with ' + other + '.')
+    else:
+        print('Chat: ' + other)
+        msgList = messages.split('///')
+        for msg in msgList:
+            print(msg)
+
 def getMessageInput():
     message = input('Enter your message: ')
     return message
@@ -224,3 +241,5 @@ def codeHandler(code):
         return 'User already exits, try loggin in.'
     elif(code == '120'):
         return 'Please login first.'
+    elif(code == '444'):
+        return 'Something went wrong.'

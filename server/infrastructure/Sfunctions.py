@@ -83,7 +83,7 @@ def sendMessage(server, conn, c, user, other, message):
     otherID = DB.get_userID(c, other)
 
     DB.send_message(conn, c, userID, otherID, message)
-    server.send('Message sent!'.encode('utf-8'))
+    server.send('100'.encode('utf-8'))
 
 def startChat(server, conn, cursor, user, other, message):
     if(DB.lookup_user(cursor, other) == False):
@@ -95,6 +95,14 @@ def startChat(server, conn, cursor, user, other, message):
         DB.start_chat(conn, cursor, userID, otherID, message)
         reply = '100'
     server.send(reply.encode('utf-8'))
+
+def checkChats(c, user, other):
+    if(DB.lookup_user(c, other) == False):
+        return True
+    else:
+        userID = DB.get_userID(c, user)
+        otherID = DB.get_userID(c, other)
+        return DB.check_chat_exists(c, userID, otherID)
 
 def getChats(server, c, user):
     chats = DB.get_user_chats(c, user)
@@ -111,6 +119,26 @@ def getChats(server, c, user):
         reply = reply + title + ': ' + chat[3] + '///'
     
     reply = reply.rstrip(reply[-1])
+    server.send(reply.encode('utf-8'))
+
+def recvOldMessages(server, c, user, other):
+    if(DB.lookup_user(c, other) == False):
+        reply = 'User doesn\'t exist.'
+    else:
+        userID = DB.get_userID(c, user)
+        otherID = DB.get_userID(c, other)
+        messages = DB.get_old_messages(c, userID, otherID)
+
+        if(messages == []):
+                reply = '///'
+        else:
+            reply = ''
+            for msg in messages:
+                other = DB.get_username(c, msg[2])
+                reply = reply + other + ': ' + msg[3] + '///'
+                
+            reply = reply.rstrip(reply[-1])
+
     server.send(reply.encode('utf-8'))
 
 def recvMessages(server, conn, c, user, other):

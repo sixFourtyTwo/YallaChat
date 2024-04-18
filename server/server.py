@@ -57,11 +57,14 @@ def handler(conn, addr):
                     Sfunc.sendMessage(conn, db_conn, cursor, currentUser, user, msg)
 
                 elif(cmnd == 'StChat'):
-                    other = message[1]
+                    user = message[1]
                     msg = message [2:]
                     msg = ' '.join(msg)
 
-                    Sfunc.startChat(conn, db_conn, cursor, currentUser, other, msg)
+                    if(Sfunc.checkChats(cursor, currentUser, user) == False):
+                        Sfunc.sendMessage(conn, db_conn, cursor, currentUser, user, msg)
+                    else:
+                        conn.send('444'.encode('utf-8'))
 
                 elif(cmnd == 'DispChats'):
                     Sfunc.getChats(conn, cursor, currentUser)
@@ -69,6 +72,10 @@ def handler(conn, addr):
                 elif(cmnd == 'RcvMsg'):
                     user = message[1]
                     Sfunc.recvMessages(conn, db_conn, cursor, currentUser, user)
+
+                elif(cmnd == 'RcvOldMsg'):
+                    user = message[1]
+                    Sfunc.recvOldMessages(conn, cursor, currentUser, user)
 
                 elif(cmnd == 'GPFR'):
                     Sfunc.getPendingFR(conn, cursor, currentUser)
