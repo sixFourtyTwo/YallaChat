@@ -96,6 +96,7 @@ def startChat(server, conn, cursor, user, other, message):
         otherID = DB.get_userID(cursor, other)
 
         DB.start_chat(conn, cursor, userID, otherID, message)
+        DB.send_message(conn, cursor, userID, otherID, message)
         reply = '100'
     server.send(reply.encode('utf-8'))
 
@@ -122,10 +123,6 @@ def getChats(server, c, user):
             elif(user2 == user):
                 title = user1
             reply = reply + title + ': ' + chat[3] + '///'
-        
-        reply = reply.rstrip(reply[-1])
-        reply = reply.rstrip(reply[-1])
-        reply = reply.rstrip(reply[-1])
     print(reply)
     server.send(reply.encode('utf-8'))
 
@@ -142,7 +139,7 @@ def recvOldMessages(server, c, user, other):
         else:
             reply = ''
             for msg in messages:
-                other = DB.get_username(c, msg[2])
+                other = DB.get_username(c, msg[1])
                 reply = reply + other + ': ' + msg[3] + '///'
                 
             reply = reply.rstrip(reply[-1])

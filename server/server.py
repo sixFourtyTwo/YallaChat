@@ -68,7 +68,7 @@ def handler(conn, addr):
                     msg = ' '.join(msg)
 
                     if(Sfunc.checkChats(cursor, currentUser, user) == False):
-                        Sfunc.sendMessage(conn, db_conn, cursor, currentUser, user, msg)
+                        Sfunc.startChat(conn, db_conn, cursor, currentUser, user, msg)
                     else:
                         conn.send('444'.encode('utf-8'))
 

@@ -218,7 +218,7 @@ def startChat(client):
     message = 'StChat ' + user + ' ' + uInput
 
     client.send(message.encode('utf-8'))
-    print(codeHandler(client.recv(1024).decode('utf-8')))
+    print(client.recv(1024).decode('utf-8'))
 
 def dispChats(client):
     client.send('DispChats'.encode('utf-8'))
