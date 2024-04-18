@@ -24,59 +24,47 @@ def commandHandler(client, command):
     elif(command == 'help'):
         print('Commands: login, register, onlinecheck, add friend, help :D')
     elif(command == 'add friend'):
-        addFriend(client)
+        addFriendsCollector(client)
     elif(command == 'fetch requests'):
-        dispFriendRequests(client)
+        dispFriendReqsCollector(client)
     elif(command == 'fetch friends'):
-        dispFriends(client)
+        dispFriendsCollector(client)
     elif(command == 'accept pending'):
-        acceptFR(client)
-    elif(command == 'reject pending'):
-        rejectFR(client)
+        acceptFRCollector(client)
+    elif(command == 'reject pending'): #ISSUE 3
+        rejectFRCollector(client)
     elif(command == 'send message'):
-        sendMessage(client)
-    elif(command == 'disp messages'):
-        getNewMsgs(client)
+        sendMessageCollector(client)
+    elif(command == 'disp messages'): #ISSUE 1 & 2
+        getNewMessagesCollector(client)
     elif(command == 'disp old messages'):
-        getOldMsgs(client)
+        getOldMsgsCollector(client)
     elif(command == 'start chat'):
-        startChat(client)
+        startChatCollector(client)
     elif(command == 'disp chats'):
-        dispChats(client)
+        dispChatsCollector(client)
 
-def addFriend(client):
-    username = input('Username: ')
-    message = 'ADDF ' + username
+def addFriend(client, user):
+    message = 'ADDF ' + user
     client.send(message.encode('utf-8'))
     
-    print(client.recv(1024).decode('utf-8'))
-    return
+    return client.recv(1024).decode('utf-8')
 
 def dispFriendRequests(client):
     friendReqs = getPendingFR(client)
 
     if(friendReqs == 'none'):
-        print('You have no pending friend requests.')
-        return
+        return 'You have no pending friend requests.'
 
-    print('Incoming Friend Requests: ')
-    friends = friendReqs.split(',')
-
-    for friend in friends:
-        print('-' + friend)
+    return friendReqs.split(',')
 
 def dispFriends(client):
     friendsList = getFriends(client)
 
     if(friendsList == 'none'):
-        print('You have no friends. ')
-        return
+        return 'You have no friends.'
     
-    print('Friends: ')
-    friends = friendsList.split(',')
-
-    for friend in friends:
-        print('-' + friend)
+    return friendsList.split(',')
 
 def getFriends(client):
     client.send('GETF'.encode('utf-8'))
@@ -86,84 +74,53 @@ def getPendingFR(client):
     client.send('GPFR'.encode('utf-8'))
     return client.recv(1024).decode('utf-8')
 
-def acceptFR(client):
+def acceptFR(client, user):
     friendReqs = getPendingFR(client)
     friends = friendReqs.split(',')
     other = None
-
-    user = input('Username: ')
 
     for friend in friends:
         if(user == friend):
             other = friend
             break
     if(other == None):
-        print('\'' + user + '\' does not exist in your pending friend requests.')
-        return
+        return '\'' + user + '\' does not exist in your pending friend requests.'
+    
     message = 'AcFR ' + other
     client.send(message.encode('utf-8'))
 
-    print(client.recv(1024).decode('utf-8'))
+    return client.recv(1024).decode('utf-8')
 
-def rejectFR(client):
+def rejectFR(client, user):
     friendReqs = getPendingFR(client)
     friends = friendReqs.split(',')
     other = None
-
-    user = input('Username: ')
 
     for friend in friends:
         if(user == friend):
             other = friend
             break
     if(other == None):
-        print('\'' + user + '\' does not exist in your pending friend requests.')
-        return
+        return '\'' + user + '\' does not exist in your pending friend requests.'
+    
     message = 'RjFR ' + other
     client.send(message.encode('utf-8'))
 
-    print(client.recv(1024).decode('utf-8'))
-
-def collectLogin(client):
-    uname = input('Username: ')
-    password = input('Password: ')
-    
-    return login(client, uname, password)
+    return client.recv(1024).decode('utf-8')
 
 def login(client, uname, password):
     message = 'LOGIN ' + uname + ' ' + password
     client.send(message.encode('utf-8'))
 
     repCode = client.recv(1024).decode('utf-8')
-    print(repCode)
-
-def collectRegister(client):
-    name = input('Enter your name: ')
-
-    while True:
-        email = input('Enter email: ')
-        try:
-            if(email.split('@')[1] != 'gmail.com'):
-                raise Exception
-            else: break
-        except Exception:
-            print('Email is invalid.')
-
-    uname = input('Enter username: ')
-    password = input('Enter password: ')
-
-    return register(client, name, email, uname, password)
+    return repCode
 
 def register(client, name, email, username, password):
     message = 'REGISTER ' + name + ' ' + email + ' ' + username + ' ' + password
     client.send(message.encode('utf-8'))
 
     repCode = client.recv(1024).decode('utf-8')
-    print(repCode)
-
-def isOnlineCollector(client):
-    user = input('Who do you wish to check?: ')
-    print(isOnline(client, user))
+    return repCode
 
 def isOnline(client, user):
     message = 'IOnline ' + user
@@ -171,54 +128,33 @@ def isOnline(client, user):
 
     return client.recv(1024).decode('utf-8')
 
-def getNewMsgs(client):
-    other = input('Enter user: ')
+def getNewMsgs(client, other):
     toSend = 'RcvMsg ' + other
 
     client.send(toSend.encode('utf-8'))
     messages = client.recv(1024).decode()
 
-    if(messages == '///'):
-        print('You have no new messages.')
-    else:
-        msgList = messages.split('///')
-        for msg in msgList:
-            print(msg)
+    return messages
 
-def getOldMsgs(client):
-    other = input('User: ')
+def getOldMsgs(client, other):
     toSend = 'RcvOldMsg ' + other
 
     client.send(toSend.encode('utf-8'))
     messages = client.recv(1024).decode()
 
-    if(messages == '///'):
-        print('You have no messages with ' + other + '.')
-    else:
-        print('Chat: ' + other)
-        msgList = messages.split('///')
-        for msg in msgList:
-            print(msg)
+    return messages
 
-def getMessageInput():
-    message = input('Enter your message: ')
-    return message
-
-def sendMessage(client):
-    user = input('Enter user: ')
-    uInput = getMessageInput()
+def sendMessage(client, user, uInput):
     message = 'SMsg ' + user + ' ' + uInput
 
     client.send(message.encode('utf-8'))
-    print(client.recv(1024).decode('utf-8'))
+    return client.recv(1024).decode('utf-8')
 
-def startChat(client):
-    user = input('Enter user: ')
-    uInput = getMessageInput()
+def startChat(client, user, uInput):
     message = 'StChat ' + user + ' ' + uInput
 
     client.send(message.encode('utf-8'))
-    print(client.recv(1024).decode('utf-8'))
+    return client.recv(1024).decode('utf-8')
 
 def dispChats(client):
     client.send('DispChats'.encode('utf-8'))
@@ -228,8 +164,8 @@ def dispChats(client):
         chatList = []
     else:
         chatList = chats.split('///')
+    chatList.pop()
 
-    print(chatList)
     return chatList
 
 def codeHandler(code):
@@ -246,4 +182,105 @@ def codeHandler(code):
     elif(code == '120'):
         return 'Please login first.'
     elif(code == '444'):
-        return 'Something went wrong.'
+        return 'Something went wrong.'    
+
+
+
+##COLLECTOR FUNCTIONS, USELESS WHEN GUI IS IMPLEMENTED:
+def isOnlineCollector(client):
+    user = input('Who do you wish to check?: ')
+    print(isOnline(client, user))
+
+def addFriendsCollector(client):
+    user = input('Username: ')
+    print(addFriend(client, user))
+
+def collectRegister(client):
+    name = input('Enter your name: ')
+
+    while True:
+        email = input('Enter email: ')
+        try:
+            if(email.split('@')[1] != 'gmail.com'):
+                raise Exception
+            else: break
+        except Exception:
+            print('Email is invalid.')
+
+    uname = input('Enter username: ')
+    password = input('Enter password: ')
+
+    print(register(client, name, email, uname, password))
+
+def collectLogin(client):
+    uname = input('Username: ')
+    password = input('Password: ')
+    
+    print(login(client, uname, password))
+
+def dispFriendsCollector(client):
+    friends = dispFriends(client)
+
+    if(friends == 'You have no friends.'):
+        print(friends)
+    else:
+        for friend in friends:
+            print('-' + friend)
+
+def dispFriendReqsCollector(client):
+    friends = dispFriendRequests(client)
+
+    if(friends == 'You have no pending friend requests.'):
+        print(friends)
+    else:
+        for friend in friends:
+            print('-' + friend)
+
+def acceptFRCollector(client):
+    user = input('Username: ')
+    print(acceptFR(client, user))
+
+def rejectFRCollector(client):
+    user = input('Username: ')
+    print(rejectFR(client, user))
+
+def getMessageInput():
+    message = input('Enter your message: ')
+    return message
+
+def sendMessageCollector(client):
+    user = input('Enter user: ')
+    uInput = getMessageInput()
+
+    print(sendMessage(client, user, uInput))
+
+def getNewMessagesCollector(client):    
+    other = input('Enter user: ')
+    messages = getNewMsgs(client, other)
+
+    if(messages == '///'):
+        print('You have no new messages.')
+    else:
+        msgList = messages.split('///')
+        for msg in msgList:
+            print(msg)
+
+def getOldMsgsCollector(client):
+    other = input('User: ')
+    messages = getOldMsgs(client, other)
+
+    if(messages == '///'):
+        print('You have no messages with ' + other + '.')
+    else:
+        print('Chat: ' + other)
+        msgList = messages.split('///')
+        for msg in msgList:
+            print(msg)
+
+def startChatCollector(client):  
+    user = input('User: ')
+    uInput = getMessageInput()
+    print(startChat(client, user, uInput))
+
+def dispChatsCollector(client):
+    print(dispChats(client))
