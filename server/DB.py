@@ -84,7 +84,7 @@ def check_chat_exists(c, sender_id, receiver_id):
         else: 
             return False
 def get_user_chats(c, username):
-    c.execute('''SELECT Chats.*, sender.name AS sender_name, receiver.name AS receiver_name
+    c.execute('''SELECT Chats.*, sender.username AS sender_name, receiver.username AS receiver_name
                  FROM Chats
                  JOIN accounts AS sender ON Chats.sender_id = sender.user_id
                  JOIN accounts AS receiver ON Chats.receiver_id = receiver.user_id
@@ -167,7 +167,7 @@ def get_friends(c, user_id):
 def send_message(conn, c, sender_id, receiver_id, message):
     c.execute('''INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)''', (sender_id, receiver_id, message))
     conn.commit()
-    c.execute('''UPDATE Chats SET last_message=?''', (message,))
+    c.execute('''UPDATE Chats SET last_message=? WHERE ((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)) ''', (message, sender_id, receiver_id, receiver_id, sender_id))
     conn.commit()
 def get_old_messages(c, user_id1, user_id2):
     c.execute('''SELECT * FROM messages 
@@ -192,3 +192,4 @@ def get_new_message(conn, c, sender_id, receiver_id):
         conn.commit()
     
     return new_messages
+

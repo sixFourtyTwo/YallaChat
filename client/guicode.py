@@ -1,14 +1,11 @@
 import PyQt5.QtWidgets as qtw
 import PyQt5.QtGui as qtg
 import PyQt5.QtCore as qtc
-from PyQt5 import uic
 import infrastructure.functions as funcs
 import socket 
 
-
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(('192.168.56.1', 9999))
-
 
 class MainWindow(qtw.QWidget):
     def __init__(self):
@@ -63,7 +60,6 @@ class MainWindow(qtw.QWidget):
     def show_friends(self):
         friends_window = FriendsWindow()
         friends_window.exec_()
-
 
 
 class RegistrationWindow(qtw.QDialog):
@@ -192,6 +188,7 @@ class FriendsWindow(qtw.QDialog):
         self.layout = qtw.QVBoxLayout()
         self.setLayout
 
+
 class ChatMainWindow(qtw.QDialog):
     def __init__(self, chat_list):
         super().__init__()
@@ -213,39 +210,30 @@ class ChatMainWindow(qtw.QDialog):
         self.layout.addWidget(self.chat_list_widget)
 
         for chat in self.chat_list:
-            self.chat_list_widget.addItem(chat)
+            item = qtw.QListWidgetItem(chat)
+            item.setTextAlignment(qtc.Qt.AlignCenter)
+            item.setFlags(item.flags() | qtc.Qt.ItemIsSelectable | qtc.Qt.ItemIsUserCheckable | qtc.Qt.ItemIsEnabled)
+            item.setCheckState(qtc.Qt.Unchecked)
+            self.chat_list_widget.addItem(item)
 
         self.layout.addStretch()
 
-        self.friends_button = qtw.QPushButton("View Friends")
-        self.friends_button.setStyleSheet(
-            "background-color: #FFA500; color: white; border: 2px solid #FFA500; padding: 10px 20px; font-size: 20px;")
-        self.friends_button.clicked.connect(self.view_friends)
-        self.layout.addWidget(self.friends_button, alignment=qtc.Qt.AlignCenter)
+        self.chat_list_widget.itemClicked.connect(self.open_chat_window)
 
-        self.users_button = qtw.QPushButton("View Users")
-        self.users_button.setStyleSheet(
-            "background-color: #FFA500; color: white; border: 2px solid #FFA500; padding: 10px 20px; font-size: 20px;")
-        self.users_button.clicked.connect(self.view_users)
-        self.layout.addWidget(self.users_button, alignment=qtc.Qt.AlignCenter)
+    def open_chat_window(self, item):
+        chat_title = item.text()
+        chatting_window = ChattingWindow(chat_title)
+        chatting_window.exec_()
 
-        self.layout.addStretch()
 
-    def view_friends(self):
-        friends_window = FriendsWindow()
-        friends_window.exec_()
-
-    def view_users(self):
-        users_window = UsersWindow()
-        users_window.exec_()
-
-class UsersWindow(qtw.QDialog):
-    def __init__(self):
+class ChattingWindow(qtw.QDialog):
+    def __init__(self, chat_title):
         super().__init__()
+        self.chat_title = chat_title
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle("Users")
+        self.setWindowTitle(self.chat_title)
         self.setWindowFlags(
             qtc.Qt.Window | qtc.Qt.WindowMinimizeButtonHint | qtc.Qt.WindowMaximizeButtonHint | qtc.Qt.WindowCloseButtonHint)
         self.setStyleSheet("background-color: #ADD8E6;")
@@ -253,25 +241,20 @@ class UsersWindow(qtw.QDialog):
         self.layout = qtw.QVBoxLayout()
         self.setLayout(self.layout)
 
-        self.layout.addStretch()
+        self.message_field = qtw.QTextEdit()
+        self.layout.addWidget(self.message_field)
 
-        self.users_list = qtw.QListWidget()
-        self.layout.addWidget(self.users_list)
+        self.send_button = qtw.QPushButton("Send")
+        self.send_button.clicked.connect(self.send_message)
+        self.layout.addWidget(self.send_button)
 
-        self.update_button = qtw.QPushButton("Update Users")
-        self.update_button.setStyleSheet(
-            "background-color: #FFA500; color: white; border: 2px solid #FFA500; padding: 10px 20px; font-size: 20px;")
-        self.update_button.clicked.connect(self.update_users)
-        self.layout.addWidget(self.update_button, alignment=qtc.Qt.AlignCenter)
+        self.back_button = qtw.QPushButton("Back")
+        self.back_button.clicked.connect(self.close)
+        self.layout.addWidget(self.back_button)
 
-        self.layout.addStretch()
-
-    def update_users(self):
-        # Retrieve and display the list of users
-        users = funcs.get_users()  # Implement this function in your infrastructure.functions
-        self.users_list.clear()
-        for user in users:
-            self.users_list.addItem(user)
+    def send_message(self):
+        message = self.message_field.toPlainText()
+        # Code to send the message to the selected chat
 
 if __name__ == "__main__":
     import sys
