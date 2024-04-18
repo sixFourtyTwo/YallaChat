@@ -185,7 +185,7 @@ def get_new_message(conn, c, sender_id, receiver_id):
     # Mark the fetched messages as seen
     for msg in new_messages:
         message_id = msg[0]
-        c.execute('''UPDATE messages SET seen = 1 WHERE message_id = ?''', (message_id,))
+        c.execute('''UPDATE messages SET seen = 1 WHERE message_id = ? AND receiver_id = ?''', (message_id, receiver_id ))
         conn.commit()
     
     return new_messages
