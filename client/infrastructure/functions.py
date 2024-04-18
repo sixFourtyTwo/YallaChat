@@ -225,8 +225,7 @@ def dispChats(client):
     chats = client.recv(1024).decode('utf-8')
     chatList = chats.split('///')
 
-    for chat in chatList:
-        print(chat)
+    return chatList
 
 def codeHandler(code):
     if(code == '100'):
