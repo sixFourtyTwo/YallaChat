@@ -44,6 +44,21 @@ def create_friends(c):
     FOREIGN KEY (receiver_id) REFERENCES accounts(user_id)
 );
 ''')
+def create_groups(c):
+    c.execute('''CREATE TABLE IF NOT EXISTS Groups (
+        group_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        group_name TEXT NOT NULL
+    );''')
+
+def create_user_groups(c):
+    c.execute('''CREATE TABLE IF NOT EXISTS UserGroups (
+        user_id INTEGER,
+        group_id INTEGER,
+        FOREIGN KEY (user_id) REFERENCES accounts(user_id),
+        FOREIGN KEY (group_id) REFERENCES Groups(group_id),
+        PRIMARY KEY (user_id, group_id)
+    );''')
+#register and login
 def authenticate(c,username, password):
     c.execute("SELECT username FROM accounts WHERE username=?", (username,))
     result = c.fetchone()
@@ -68,9 +83,8 @@ def register_account(conn,c,name, email, username, password):
         conn.commit()
         print("Accout registered!")
         return '100'
-    
+#chatting functions
 def check_chat_exists(c, sender_id, receiver_id):
-        # Query the Chats table to check if a chat exists between the specified users
         c.execute('''SELECT * FROM Chats 
                           WHERE (sender_id = ? AND receiver_id = ?) 
                           OR (sender_id = ? AND receiver_id = ?)''', 
@@ -128,7 +142,7 @@ def find_request_id(c, sender_id, receiver_id):
     request_id = c.fetchone()
     return request_id[0]
 
-
+#friends functions
 def send_friend_request(conn, c, sender_id, receiver_id):
     c.execute('''INSERT INTO friend_requests (sender_id, receiver_id) VALUES (?, ?)''', (sender_id, receiver_id))
     conn.commit()
@@ -160,7 +174,7 @@ def get_friends(c, user_id):
               (user_id, user_id, user_id))
     friends = c.fetchall()
     return friends
-
+#messaging functions
 def send_message(conn, c, sender_id, receiver_id, message):
     c.execute('''INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)''', (sender_id, receiver_id, message))
     conn.commit()
@@ -175,10 +189,11 @@ def get_old_messages(c, user_id1, user_id2):
     return messages
 def get_new_message(conn, c, sender_id, receiver_id):
     c.execute('''SELECT message_id, sender_id, message 
-                  FROM messages 
-                  WHERE (sender_id = ? AND receiver_id = ?) 
-                  OR (sender_id = ? AND receiver_id = ?)
-                  AND seen = 0''', (sender_id, receiver_id, receiver_id, sender_id))
+              FROM messages 
+              WHERE ((sender_id = ? AND receiver_id = ?) 
+              OR (sender_id = ? AND receiver_id = ?))
+              AND seen = 0''', (sender_id, receiver_id, receiver_id, sender_id))
+
      
     new_messages = c.fetchall()
     
@@ -190,3 +205,57 @@ def get_new_message(conn, c, sender_id, receiver_id):
     
     return new_messages
 
+#groups functions
+def send_group_message(conn, c, sender_id, group_id, message):
+    c.execute('''INSERT INTO messages (sender_id, receiver_id, message) 
+                  SELECT ?, user_id, ? FROM UserGroups WHERE group_id = ?''', 
+              (sender_id, message, group_id))
+    conn.commit()
+
+def get_group_messages(c, group_id):
+    c.execute('''SELECT * FROM messages 
+                  WHERE receiver_id IN 
+                  (SELECT user_id FROM UserGroups WHERE group_id = ?)''', (group_id,))
+    messages = c.fetchall()
+    return messages
+def start_group(conn, c, creator_id, group_name, members):
+    # Create a new group
+    c.execute('''INSERT INTO Groups (group_name) VALUES (?)''', (group_name,))
+    conn.commit()
+    group_id = c.lastrowid
+    
+    # Add creator to the group
+    c.execute('''INSERT INTO UserGroups (user_id, group_id) VALUES (?, ?)''', (creator_id, group_id))
+    
+    # Add other members to the group
+    for member_id in members:
+        c.execute('''INSERT INTO UserGroups (user_id, group_id) VALUES (?, ?)''', (member_id, group_id))
+    
+    conn.commit()
+    print("Group '{}' created successfully!".format(group_name))
+    return group_id
+def get_group_id(c, group_name):
+    c.execute('''SELECT group_id FROM Groups WHERE group_name = ?''', (group_name,))
+    group_id = c.fetchone()
+    if group_id:
+        return group_id[0]
+    else:
+        print("Group '{}' not found.".format(group_name))
+        return None
+    
+def display_groups(c, user_id):
+    c.execute('''SELECT group_id, group_name FROM Groups
+                 WHERE group_id IN (SELECT group_id FROM UserGroups WHERE user_id = ?)''', (user_id,))
+    groups = c.fetchall()
+    return groups
+def add_to_group(conn, c, group_id, user_ids):
+    for user_id in user_ids:
+        # Check if the user is already a member of the group
+        c.execute('''SELECT * FROM UserGroups WHERE user_id = ? AND group_id = ?''', (user_id, group_id))
+        if not c.fetchone():
+            # If the user is not already a member, add them to the group
+            c.execute('''INSERT INTO UserGroups (user_id, group_id) VALUES (?, ?)''', (user_id, group_id))
+            conn.commit()
+            print("User with ID {} added to group ID {}".format(user_id, group_id))
+        else:
+            print("User with ID {} is already a member of group ID {}".format(user_id, group_id))
