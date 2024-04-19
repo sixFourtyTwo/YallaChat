@@ -9,6 +9,9 @@ onlineUsers = {}
 def handler(conn, addr):
     db_conn, cursor = DB.connect_to_database()
     DB.create_accounts(cursor)
+    DB.create_chats(cursor)
+    DB.create_friends(cursor)
+    DB.create_messages(cursor)
     print("Database connected successfully.")
     
     currentUser = None
