@@ -12,6 +12,8 @@ def handler(conn, addr):
     DB.create_chats(cursor)
     DB.create_friends(cursor)
     DB.create_messages(cursor)
+    DB.create_groups(cursor)
+    DB.create_user_groups(cursor)
     print("Database connected successfully.")
     
     currentUser = None

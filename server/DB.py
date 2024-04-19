@@ -144,9 +144,14 @@ def find_request_id(c, sender_id, receiver_id):
 
 #friends functions
 def send_friend_request(conn, c, sender_id, receiver_id):
-    c.execute('''INSERT INTO friend_requests (sender_id, receiver_id) VALUES (?, ?)''', (sender_id, receiver_id))
-    conn.commit()
-    print("friend request sent")
+    c.execute('''SELECT * FROM friend_requests WHERE ((sender_id = ? AND receiver_id = ?) OR (receiver_id = ? AND sender_id = ?))''', (sender_id, receiver_id, receiver_id, sender_id))
+    result = c.fetchone()
+    if result:
+        print("friend request already sent")
+    else:
+        c.execute('''INSERT INTO friend_requests (sender_id, receiver_id) VALUES (?, ?)''', (sender_id, receiver_id))
+        conn.commit()
+        print("friend request sent")
 
 
 def accept_friend_request(conn, c, request_id):
