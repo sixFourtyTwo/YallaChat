@@ -164,7 +164,7 @@ def dispChats(client):
         chatList = []
     else:
         chatList = chats.split('///')
-    chatList.pop()
+        chatList.pop()
 
     return chatList
 
