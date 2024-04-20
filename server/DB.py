@@ -27,7 +27,12 @@ def create_messages(c):
     message_id INTEGER PRIMARY KEY AUTOINCREMENT,
     sender_id INTEGER,
     receiver_id INTEGER,
-    message TEXT,
+    message_type TEXT,
+    content TEXT,  -- For text messages
+    file_name TEXT,  -- For multimedia messages
+    file_size INTEGER,
+    duration INTEGER,  -- For voice messages
+    thumbnail BLOB,  -- For video messages
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     seen INTEGER DEFAULT 0,
     FOREIGN KEY (sender_id) REFERENCES accounts(user_id),
@@ -266,4 +271,22 @@ def add_to_group(conn, c, group_id, user_ids):
             print("User with ID {} is already a member of group ID {}".format(user_id, group_id))
 
 
+#multimedia:
+def send_multimedia_message(conn, c, sender_id, receiver_id, message_type, content=None, file_name=None, file_size=None, duration=None, thumbnail=None):
+    c.execute('''INSERT INTO messages (sender_id, receiver_id, message_type, content, file_name, file_size, duration, thumbnail) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', 
+              (sender_id, receiver_id, message_type, content, file_name, file_size, duration, thumbnail))
+    conn.commit()
 
+def get_multimedia_messages(conn,c, user_id):
+    c.execute('''SELECT * FROM messages 
+                  WHERE receiver_id = ? AND message_type != 'text' AND seen = 0''', (user_id,))
+    multimedia_messages = c.fetchall()
+    
+    # Mark the fetched multimedia messages as seen
+    for msg in multimedia_messages:
+        message_id = msg[0]
+        c.execute('''UPDATE messages SET seen = 1 WHERE message_id = ?''', (message_id,))
+        conn.commit()
+    
+    return multimedia_messages
