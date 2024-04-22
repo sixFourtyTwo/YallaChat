@@ -27,12 +27,7 @@ def create_messages(c):
     message_id INTEGER PRIMARY KEY AUTOINCREMENT,
     sender_id INTEGER,
     receiver_id INTEGER,
-    message_type TEXT,
-    content TEXT,  -- For text messages
-    file_name TEXT,  -- For multimedia messages
-    file_size INTEGER,
-    duration INTEGER,  -- For voice messages
-    thumbnail BLOB,  -- For video messages
+    message TEXT,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     seen INTEGER DEFAULT 0,
     FOREIGN KEY (sender_id) REFERENCES accounts(user_id),
@@ -198,7 +193,7 @@ def get_old_messages(c, user_id1, user_id2):
     messages = c.fetchall()
     return messages
 def get_new_message(conn, c, sender_id, receiver_id):
-    c.execute('''SELECT message_id, sender_id, message 
+    c.execute('''SELECT message_id, sender_id, message
               FROM messages 
               WHERE ((sender_id = ? AND receiver_id = ?) 
               OR (sender_id = ? AND receiver_id = ?))
@@ -243,7 +238,7 @@ def start_group(conn, c, creator_id, group_name, members):
     
     conn.commit()
     print("Group '{}' created successfully!".format(group_name))
-    return group_id
+
 def get_group_id(c, group_name):
     c.execute('''SELECT group_id FROM Groups WHERE group_name = ?''', (group_name,))
     group_id = c.fetchone()
