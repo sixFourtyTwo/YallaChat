@@ -43,6 +43,8 @@ def commandHandler(client, command):
         startChatCollector(client)
     elif(command == 'disp chats'):
         dispChatsCollector(client)
+    elif(command == 'send group message'):
+        sendGroupMessageCollector(client)
 
 def addFriend(client, user):
     message = 'ADDF ' + user
@@ -135,6 +137,21 @@ def getNewMsgs(client, other):
     messages = client.recv(1024).decode()
 
     return messages
+
+def getGroupID(client, name):
+    msg = 'GetGID ' + name
+    client.send(msg.encode('utf-8'))
+    return client.recv(1024).decode('utf-8')
+
+def sendGroupMessage(client, message, groupName):
+    groupId = getGroupID(client, groupName)
+    
+    if(groupId == 'Doesn\'t exist.'):
+        return 'Group does not exist.'
+    else:
+        msg = 'SGM ' + groupId + ' ' + message
+        client.send(msg.encode('utf-8'))
+        return client.recv(1024).decode('utf-8')
 
 def getOldMsgs(client, other):
     toSend = 'RcvOldMsg ' + other
@@ -284,3 +301,8 @@ def startChatCollector(client):
 
 def dispChatsCollector(client):
     print(dispChats(client))
+
+def sendGroupMessageCollector(client):
+    name = input('Enter group name: ')
+    uInput = input('Enter message: ')
+    print(sendGroupMessage(client, uInput, name))

@@ -80,7 +80,7 @@ def getPendingFR(server, c, user):
 
 def sendMessage(server, conn, c, user, other, message):
     if(DB.lookup_user(c, other) == False):
-        return 'User doesn\'t exist.'
+        server.send('User doesn\'t exist.'.encode('utf-8'))
 
     userID = DB.get_userID(c, user)
     otherID = DB.get_userID(c, other)
@@ -168,3 +168,18 @@ def register(server, message, cursor, db_conn):
     server.send(reply.encode())
 
     return username
+
+def getGroupID(server, c, name):
+    ID = DB.get_group_id(c, name)
+
+    if(ID == None):
+        reply = 'Doesn\'t exist.'
+    else:
+        reply = ID
+
+    server.send(reply.encode('utf-8'))
+    
+def sendGroupMessage(server, conn, c, groupID, user, message):
+    userID = DB.get_userID(user)
+    DB.send_group_message(conn, c, userID, groupID, message)
+    server.send('Success!')

@@ -67,6 +67,20 @@ def handler(conn, addr):
 
                     Sfunc.sendMessage(conn, db_conn, cursor, currentUser, user, msg)
 
+                elif(cmnd == 'GetGID'):
+                    name = message[1]
+
+                    Sfunc.getGroupID(conn, cursor, name)
+                
+                elif(cmnd == 'SGM'):
+                    ID = message[1]
+                    msg = message[2:]
+
+                    Sfunc.sendGroupMessage(conn, db_conn, cursor, ID, currentUser, msg)
+
+                elif(cmnd == 'SGroup'):
+                    pass
+
                 elif(cmnd == 'StChat'):
                     user = message[1]
                     msg = message [2:]
