@@ -10,8 +10,7 @@ def create_accounts(c):
              name TEXT,
              email TEXT,
            username TEXT,
-             password TEXT,
-            status TEXT DEFAULT "Busy");
+             password TEXT);
            ''')
 def create_chats(c):
     c.execute('''CREATE TABLE IF NOT EXISTS Chats (
@@ -77,7 +76,7 @@ def register_account(conn,c,name, email, username, password):
         print("User already exits try logging in ")
         return '111'
     else:
-        c.execute("INSERT INTO accounts VALUES (NULL, ?, ?, ?, ?,?);", (name, email,username, password, "Busy"))
+        c.execute("INSERT INTO accounts VALUES (NULL, ?, ?, ?, ?);", (name, email,username, password))
         conn.commit()
         print("Accout registered!")
         return '100'
@@ -290,11 +289,8 @@ def get_multimedia_messages(conn,c, user_id):
     
     return multimedia_messages
 
-def initDB():
-    conn, c = connect_to_database()
-    create_accounts(c)
-    create_chats(c)
-    create_groups(c)
-    create_user_groups(c)
-    create_friends(c)
-    create_messages(c)
+#users
+def getAllUsers(c):
+    c.execute("SELECT username FROM accounts")
+    users = c.fetchall()
+    return users
