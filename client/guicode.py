@@ -232,7 +232,7 @@ class SignInWindow(qtw.QDialog):
         username = self.lineEdit.text()
         password = self.lineEdit_2.text()
 
-        ip = '192.168.56.1'
+        ip = '192.168.47.126'
         port = 9999
 
         if not self.client_manager.connect_to_server(ip, port):
@@ -272,7 +272,7 @@ class RegistrationWindow(qtw.QDialog):
         username = self.lineEdit.text()
         password = self.lineEdit_2.text()
 
-        ip = '192.168.56.1'
+        ip = '192.168.47.126'
         port = 9999
 
         if not self.client_manager.connect_to_server(ip, port):

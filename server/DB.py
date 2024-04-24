@@ -10,7 +10,8 @@ def create_accounts(c):
              name TEXT,
              email TEXT,
            username TEXT,
-             password TEXT);
+             password TEXT,
+              status TEXT DEFAULT Busy);
            ''')
 def create_chats(c):
     c.execute('''CREATE TABLE IF NOT EXISTS Chats (
@@ -211,9 +212,16 @@ def get_new_message(conn, c, sender_id, receiver_id):
 
 #groups functions
 def send_group_message(conn, c, sender_id, group_id, message):
-    c.execute('''INSERT INTO messages (sender_id, receiver_id, message) 
-                  SELECT ?, user_id, ? FROM UserGroups WHERE group_id = ?''', 
-              (sender_id, message, group_id))
+    # Get all user_ids of group members
+    c.execute('''SELECT user_id FROM UserGroups WHERE group_id = ?''', (group_id,))
+    group_members = c.fetchall()
+    
+    # Insert the message for each group member
+    for member in group_members:
+        receiver_id = member[0]
+        c.execute('''INSERT INTO messages (sender_id, receiver_id, message) 
+                     VALUES (?, ?, ?)''', (sender_id, receiver_id, message))
+    
     conn.commit()
 
 def get_group_messages(c, group_id):
@@ -233,7 +241,7 @@ def start_group(conn, c, creator_id, group_name, members):
     
     # Add other members to the group
     for member_id in members:
-        c.execute('''INSERT INTO UserGroups (user_id, group_id) VALUES (?, ?)''', (member_id, group_id))
+        c.execute('''INSERT INTO UserGroups (user_id, group_id) VALUES (?, ?)''', (get_userID(member_id), group_id))
     
     conn.commit()
     print("Group '{}' created successfully!".format(group_name))
