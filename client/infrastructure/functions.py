@@ -320,3 +320,12 @@ def startGroupCollector(client):
     members = input('Enter members [seperated by commas]: ')
 
     print(startGroup(client, name, members))
+
+def extract_first_part(string):
+    # Find the index of the colon ":"
+    colon_index = string.find(":")
+    # If colon is found, return the substring before it, otherwise return the original string
+    if colon_index != -1:
+        return string[:colon_index]
+    else:
+        return string
