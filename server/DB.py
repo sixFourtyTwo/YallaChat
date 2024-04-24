@@ -54,10 +54,7 @@ def create_groups(c):
 def create_user_groups(c):
     c.execute('''CREATE TABLE IF NOT EXISTS UserGroups (
         user_id INTEGER,
-        group_id INTEGER,
-        FOREIGN KEY (user_id) REFERENCES accounts(user_id),
-        FOREIGN KEY (group_id) REFERENCES Groups(group_id),
-        PRIMARY KEY (user_id, group_id)
+        group_id INTEGER
     );''')
 #register and login
 def authenticate(c,username, password):
@@ -292,3 +289,12 @@ def get_multimedia_messages(conn,c, user_id):
         conn.commit()
     
     return multimedia_messages
+
+def initDB():
+    conn, c = connect_to_database()
+    create_accounts(c)
+    create_chats(c)
+    create_groups(c)
+    create_user_groups(c)
+    create_friends(c)
+    create_messages(c)

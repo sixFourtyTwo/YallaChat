@@ -64,6 +64,25 @@ def handler(conn, addr):
                     
                     conn.send(reply.encode('utf-8'))
 
+                elif(cmnd == 'GOFriends'):
+                    friends = message[1]
+                    friends = friends.split(',')
+
+                    reply = ''
+                    
+                    for friend in friends:
+                        if(friend not in onlineUsers):
+                            continue
+                        else:
+                            reply = reply + friend + ','
+
+                    if(reply == ''):
+                        reply = 'None'
+                    else:
+                        reply = reply.rstrip(reply[-1])
+                    
+                    conn.send(reply.encode('utf-8'))
+
                 elif(cmnd == 'SMsg'):
                     user = message[1]
                     msg = message[2:]

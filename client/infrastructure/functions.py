@@ -47,6 +47,8 @@ def commandHandler(client, command):
         sendGroupMessageCollector(client)
     elif(command == 'start group'):
         startGroupCollector(client)
+    elif(command == 'GOF'):
+        GOFColl(client)
 
 def addFriend(client, user):
     message = 'ADDF ' + user
@@ -193,6 +195,20 @@ def dispChats(client):
 
     return chatList
 
+def getOnlineFriends(client):
+    friends = getFriends(client)
+
+    msg = 'GOFriends ' + friends
+    client.send(msg.encode('utf-8'))
+    reply = client.recv(1024).decode('utf-8')
+
+    if(reply == 'None'):
+        reply = 'None of your friends are online.'
+    else:
+        reply = reply.split(',')
+
+    return reply
+
 def codeHandler(code):
     if(code == '100'):
         return 'Success'
@@ -329,3 +345,6 @@ def extract_first_part(string):
         return string[:colon_index]
     else:
         return string
+    
+def GOFColl(client):
+    print(getOnlineFriends(client))
