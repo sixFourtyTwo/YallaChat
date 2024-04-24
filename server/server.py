@@ -31,11 +31,15 @@ def handler(conn, addr):
                     password = message[2:]
                     password = ' '.join(password)
 
-                    dbCheck = Sfunc.login(conn, cursor, username, password)
+                    if(username in onlineUsers):
+                        conn.send('You are already logged in somewhere else...'.encode('utf-8'))
+                    else:
 
-                    if(dbCheck != 'not found' and dbCheck != 'Wrong password.'):
-                        onlineUsers.update({username:username})
-                        currentUser = username
+                        dbCheck = Sfunc.login(conn, cursor, username, password)
+
+                        if(dbCheck != 'not found' and dbCheck != 'Wrong password.'):
+                            onlineUsers.update({username:username})
+                            currentUser = username
 
                 elif(cmnd == "REGISTER"):
                     username = Sfunc.register(conn, message, cursor, db_conn)
@@ -65,7 +69,11 @@ def handler(conn, addr):
                     msg = message[2:]
                     msg = ' '.join(msg)
 
-                    Sfunc.sendMessage(conn, db_conn, cursor, currentUser, user, msg)
+                    chatExistence = Sfunc.checkChats(cursor, currentUser, user)
+                    if(chatExistence == False):
+                        conn.send('Please create a chat before sending message..'.encode('utf'))
+                    else:
+                        Sfunc.sendMessage(conn, db_conn, cursor, currentUser, user, msg)
 
                 elif(cmnd == 'GetGID'):
                     name = message[1]
@@ -76,10 +84,14 @@ def handler(conn, addr):
                     ID = message[1]
                     msg = message[2:]
 
+                    msg = ' '.join(msg)
+
                     Sfunc.sendGroupMessage(conn, db_conn, cursor, ID, currentUser, msg)
 
                 elif(cmnd == 'SGroup'):
-                    pass
+                    name = message[1]
+                    members = message[2]
+                    Sfunc.startGroup(conn, db_conn, cursor, currentUser, name, members)
 
                 elif(cmnd == 'StChat'):
                     user = message[1]

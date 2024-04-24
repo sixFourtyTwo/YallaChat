@@ -87,6 +87,22 @@ def sendMessage(server, conn, c, user, other, message):
 
     DB.send_message(conn, c, userID, otherID, message)
     server.send('100'.encode('utf-8'))
+    
+def startGroup(server, conn, c, user, name, members):
+    userID = DB.get_userID(c, user)
+
+    members = members.split(',')
+    print(members)
+
+    for member in members:
+        if DB.lookup_user(c, member) == False:
+            server.send(member + ' is not a valid user.'.encode('utf-8'))
+            return
+    
+    DB.start_group(conn, c, userID, name, members)
+
+    reply = 'Group {} was successfully created!'.format(name)
+    server.send(reply.encode('utf-8'))
 
 def startChat(server, conn, cursor, user, other, message):
     if(DB.lookup_user(cursor, other) == False):
@@ -177,9 +193,13 @@ def getGroupID(server, c, name):
     else:
         reply = ID
 
+    reply = str(reply)
     server.send(reply.encode('utf-8'))
     
 def sendGroupMessage(server, conn, c, groupID, user, message):
-    userID = DB.get_userID(user)
+    groupID = int(groupID)
+    userID = DB.get_userID(c, user)
+    print(userID)
+    print
     DB.send_group_message(conn, c, userID, groupID, message)
-    server.send('Success!')
+    server.send('Success!'.encode('utf-8'))

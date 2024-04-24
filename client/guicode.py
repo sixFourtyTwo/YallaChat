@@ -224,7 +224,7 @@ class SignInWindow(qtw.QDialog):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('client/loginUi1.1.ui', self)
+        uic.loadUi('loginUi1.1.ui', self)
         self.pushButton.clicked.connect(self.sign_in)
         self.pushButton_2.clicked.connect(self.show_registration)
 
@@ -262,7 +262,7 @@ class RegistrationWindow(qtw.QDialog):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('client/registerUi.ui', self)
+        uic.loadUi('registerUi.ui', self)
         self.pushButton.clicked.connect(self.register)
         self.pushButton_2.clicked.connect(self.show_login_window)
 

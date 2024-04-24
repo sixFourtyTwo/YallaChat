@@ -241,7 +241,7 @@ def start_group(conn, c, creator_id, group_name, members):
     
     # Add other members to the group
     for member_id in members:
-        c.execute('''INSERT INTO UserGroups (user_id, group_id) VALUES (?, ?)''', (get_userID(member_id), group_id))
+        c.execute('''INSERT INTO UserGroups (user_id, group_id) VALUES (?, ?)''', (get_userID(c, member_id), group_id))
     
     conn.commit()
     print("Group '{}' created successfully!".format(group_name))

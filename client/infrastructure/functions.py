@@ -22,7 +22,7 @@ def commandHandler(client, command):
     elif(command == 'onlinecheck'):
         isOnlineCollector(client)
     elif(command == 'help'):
-        print('Commands: login, register, onlinecheck, add friend, help :D')
+        print('Commands: login, register, onlinecheck, add friend, help')
     elif(command == 'add friend'):
         addFriendsCollector(client)
     elif(command == 'fetch requests'):
@@ -31,11 +31,11 @@ def commandHandler(client, command):
         dispFriendsCollector(client)
     elif(command == 'accept pending'):
         acceptFRCollector(client)
-    elif(command == 'reject pending'): #ISSUE 3
+    elif(command == 'reject pending'):
         rejectFRCollector(client)
     elif(command == 'send message'):
         sendMessageCollector(client)
-    elif(command == 'disp messages'): #ISSUE 1 & 2
+    elif(command == 'disp messages'):
         getNewMessagesCollector(client)
     elif(command == 'disp old messages'):
         getOldMsgsCollector(client)
@@ -45,6 +45,8 @@ def commandHandler(client, command):
         dispChatsCollector(client)
     elif(command == 'send group message'):
         sendGroupMessageCollector(client)
+    elif(command == 'start group'):
+        startGroupCollector(client)
 
 def addFriend(client, user):
     message = 'ADDF ' + user
@@ -152,6 +154,12 @@ def sendGroupMessage(client, message, groupName):
         msg = 'SGM ' + groupId + ' ' + message
         client.send(msg.encode('utf-8'))
         return client.recv(1024).decode('utf-8')
+
+def startGroup(client, name, members):
+    message = 'SGroup ' + name + ' ' + members
+
+    client.send(message.encode('utf-8'))
+    return client.recv(1024).decode('utf-8')
 
 def getOldMsgs(client, other):
     toSend = 'RcvOldMsg ' + other
@@ -307,11 +315,8 @@ def sendGroupMessageCollector(client):
     uInput = input('Enter message: ')
     print(sendGroupMessage(client, uInput, name))
 
-def extract_first_part(string):
-    # Find the index of the colon ":"
-    colon_index = string.find(":")
-    # If colon is found, return the substring before it, otherwise return the original string
-    if colon_index != -1:
-        return string[:colon_index]
-    else:
-        return string
+def startGroupCollector(client):
+    name = input('Enter Group Name: ')
+    members = input('Enter members [seperated by commas]: ')
+
+    print(startGroup(client, name, members))
