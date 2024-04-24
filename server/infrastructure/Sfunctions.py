@@ -96,7 +96,8 @@ def startGroup(server, conn, c, user, name, members):
 
     for member in members:
         if DB.lookup_user(c, member) == False:
-            server.send(member + ' is not a valid user.'.encode('utf-8'))
+            msg = member + ' is not a valid user.'
+            server.send(msg.encode('utf-8'))
             return
     
     DB.start_group(conn, c, userID, name, members)
