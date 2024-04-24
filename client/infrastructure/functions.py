@@ -306,3 +306,12 @@ def sendGroupMessageCollector(client):
     name = input('Enter group name: ')
     uInput = input('Enter message: ')
     print(sendGroupMessage(client, uInput, name))
+
+def extract_first_part(string):
+    # Find the index of the colon ":"
+    colon_index = string.find(":")
+    # If colon is found, return the substring before it, otherwise return the original string
+    if colon_index != -1:
+        return string[:colon_index]
+    else:
+        return string

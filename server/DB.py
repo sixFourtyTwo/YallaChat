@@ -195,9 +195,8 @@ def get_old_messages(c, user_id1, user_id2):
 def get_new_message(conn, c, sender_id, receiver_id):
     c.execute('''SELECT message_id, sender_id, message
               FROM messages 
-              WHERE ((sender_id = ? AND receiver_id = ?) 
-              OR (sender_id = ? AND receiver_id = ?))
-              AND seen = 0''', (sender_id, receiver_id, receiver_id, sender_id))
+              WHERE (sender_id = ? AND receiver_id = ?) 
+              AND seen = 0''', (sender_id, receiver_id))
 
      
     new_messages = c.fetchall()
