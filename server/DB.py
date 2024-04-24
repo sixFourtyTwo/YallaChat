@@ -292,4 +292,3 @@ def get_multimedia_messages(conn,c, user_id):
         conn.commit()
     
     return multimedia_messages
-
