@@ -176,10 +176,10 @@ class ChattingWindow(qtw.QDialog):
 
     def update_message_area(self, messages):
         message_list = messages.split("///")
-        messages_to_display = set()  # Use a set to store unique messages
+        messages_to_display = []  # Use a list to store messages to maintain the order
         for message in message_list:
             if message.strip():  # Check if the message is not empty after stripping whitespace
-                messages_to_display.add(message)
+                messages_to_display.append(message)
         for message in messages_to_display:
             self.message_area.append(message)
 
@@ -188,6 +188,7 @@ class ChattingWindow(qtw.QDialog):
         try:
             funcs.sendMessage(self.client, funcs.extract_first_part(self.chat_title), message)
             self.input_field.clear()  # Clear input field after sending the message
+            self.update_message_area(message)  # Update message area with the sent message immediately
         except Exception as e:
             print("Error sending message:", e)
 
