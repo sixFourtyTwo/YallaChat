@@ -291,3 +291,9 @@ def get_multimedia_messages(conn,c, user_id):
         conn.commit()
     
     return multimedia_messages
+
+#users
+def getAllUsers(c):
+    c.execute("SELECT username FROM accounts")
+    users = c.fetchall()
+    return users
