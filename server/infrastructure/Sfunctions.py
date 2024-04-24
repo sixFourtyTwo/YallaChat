@@ -204,3 +204,17 @@ def sendGroupMessage(server, conn, c, groupID, user, message):
     print
     DB.send_group_message(conn, c, userID, groupID, message)
     server.send('Success!'.encode('utf-8'))
+
+def getUsers(server,c):
+    
+    A = DB.getAllUsers(c)
+    if (A == []):
+        reply = 'none'
+    else:
+        reply = ''
+        for user in A:
+            reply += str(user[0]) + ','
+            
+        reply = reply.rstrip(reply[-1])
+
+    server.send(reply.encode('utf-8'))
