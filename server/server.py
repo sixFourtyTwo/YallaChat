@@ -64,6 +64,11 @@ def handler(conn, addr):
                     
                     conn.send(reply.encode('utf-8'))
 
+                elif(cmnd == 'GAU'):
+                    Sfunc.getUsers(conn, cursor)
+
+                #elif(cmnd == '')
+
                 elif(cmnd == 'GOFriends'):
                     friends = message[1]
                     friends = friends.split(',')

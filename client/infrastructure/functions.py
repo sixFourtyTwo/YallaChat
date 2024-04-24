@@ -1,5 +1,6 @@
 import socket
 import time
+import random
 
 def connect(client):
     IP = input('Enter IP: ')
@@ -49,6 +50,10 @@ def commandHandler(client, command):
         startGroupCollector(client)
     elif(command == 'GOF'):
         GOFColl(client)
+    elif(command == 'GAU'):
+        GAUColl(client)
+    elif(command == 'GRU'):
+        getRandomUserColl(client)
 
 def addFriend(client, user):
     message = 'ADDF ' + user
@@ -209,6 +214,19 @@ def getOnlineFriends(client):
 
     return reply
 
+def getRandomUser(client):
+    users = getAllUsers(client)
+    users = users.split(',')
+
+    rndmNbr = random.randint(0, len(users)-1)
+
+    return users[rndmNbr]
+
+def getAllUsers(client):
+    msg = 'GAU'
+    client.send(msg.encode('utf-8'))
+    return client.recv(1024).decode('utf-8')
+
 def codeHandler(code):
     if(code == '100'):
         return 'Success'
@@ -348,3 +366,9 @@ def extract_first_part(string):
     
 def GOFColl(client):
     print(getOnlineFriends(client))
+
+def GAUColl(client):
+    print(getAllUsers(client))
+
+def getRandomUserColl(client):
+    print(getRandomUser(client))
