@@ -11,7 +11,7 @@ def create_accounts(c):
              email TEXT,
            username TEXT,
              password TEXT,
-              status TEXT DEFAULT Busy);
+            status TEXT DEFAULT "Busy");
            ''')
 def create_chats(c):
     c.execute('''CREATE TABLE IF NOT EXISTS Chats (
@@ -80,7 +80,7 @@ def register_account(conn,c,name, email, username, password):
         print("User already exits try logging in ")
         return '111'
     else:
-        c.execute("INSERT INTO accounts VALUES (NULL, ?, ?, ?, ?);", (name, email,username, password))
+        c.execute("INSERT INTO accounts VALUES (NULL, ?, ?, ?, ?,?);", (name, email,username, password, "Busy"))
         conn.commit()
         print("Accout registered!")
         return '100'
