@@ -91,25 +91,30 @@ class ChatMainWindow(qtw.QDialog):
         self.new_chat_button.clicked.connect(self.new_chat)
         self.layout.addWidget(self.new_chat_button)
         
-        # Add a "New Chat" button to open a window for starting a new chat with a friend
-        """ self.refresh_button = qtw.QPushButton("Refresh")
+        self.refresh_button = qtw.QPushButton("Refresh")
         self.refresh_button.setStyleSheet("background-color: rgba(85, 98, 112, 255); color: rgba(255, 255, 255, 200); border-radius: 5px;")
-        #self.refresh_button.clicked.connect(self.refreshChats)
-        self.layout.addWidget(self.refresh_button)"""
+        self.refresh_button.clicked.connect(self.refreshChats)
+        self.layout.addWidget(self.refresh_button)
+        self.layout.addStretch()
 
         self.layout.addStretch()
         
     def refreshChats(self):
-        """self.recent_chats_list.clear()
-        for chat in self.chat_list:
-            chat_button = qtw.QPushButton(chat)
-            chat_button.clicked.connect(lambda checked, button=chat_button: self.open_chat_window(button))
-            item = qtw.QListWidgetItem()
-            item.setSizeHint(chat_button.sizeHint())
-            self.recent_chats_list.addItem(item)
-            self.recent_chats_list.setItemWidget(item, chat_button)
-        self.layout.addWidget(self.recent_chats_list)"""
-        pass
+        try:
+            # Clear existing chat list
+            self.recent_chats_list.clear()
+            # Fetch updated chat list
+            chat_list = funcs.dispChats(self.client_manager.get_client())
+            # Populate the chat list widget with updated chats
+            for chat in chat_list:
+                chat_button = qtw.QPushButton(chat)
+                chat_button.clicked.connect(lambda checked, button=chat_button: self.open_chat_window(button))
+                item = qtw.QListWidgetItem()
+                item.setSizeHint(chat_button.sizeHint())
+                self.recent_chats_list.addItem(item)
+                self.recent_chats_list.setItemWidget(item, chat_button)
+        except Exception as e:
+            print("Error refreshing chats:", e)
 
     def search_online_users(self):
         search_window = SearchWindow(self.client_manager.get_client(), self.search_input)
