@@ -221,9 +221,9 @@ def send_group_message(conn, c, sender_id, group_id, message):
     conn.commit()
 
 def get_group_messages(c, group_id):
-    c.execute('''SELECT * FROM messages 
-                  WHERE receiver_id IN 
-                  (SELECT user_id FROM UserGroups WHERE group_id = ?)''', (group_id,))
+    c.execute('''SELECT messages.* FROM messages 
+                  JOIN UserGroups ON messages.receiver_id = UserGroups.user_id
+                  WHERE UserGroups.group_id = ?''', (group_id,))
     messages = c.fetchall()
     return messages
 def start_group(conn, c, creator_id, group_name, members):
