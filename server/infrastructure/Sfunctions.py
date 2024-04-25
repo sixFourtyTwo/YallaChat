@@ -218,3 +218,20 @@ def getUsers(server,c):
         reply = reply.rstrip(reply[-1])
 
     server.send(reply.encode('utf-8'))
+
+def getGroupMessages(server, c, groupName, user):
+    groupID = DB.get_group_id(c, groupName)
+    userID = DB.get_userID(c, user)
+
+    messages = DB.get_group_messages(c, groupID, userID)
+
+    if(len(messages) == 0):
+        reply = 'None'
+    else:
+        reply = ''
+        for message in messages:
+            reply = reply + message[3] + ','
+        reply = reply.rstrip(reply[-1])
+
+    server.send(reply.encode('utf-8'))
+    

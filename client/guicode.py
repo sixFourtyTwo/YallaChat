@@ -273,7 +273,7 @@ class SignInWindow(qtw.QDialog):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('client/loginUi1.1.ui', self)
+        uic.loadUi('loginUi1.1.ui', self)
         self.pushButton.clicked.connect(self.sign_in)
         self.pushButton_2.clicked.connect(self.show_registration)
 
@@ -281,7 +281,7 @@ class SignInWindow(qtw.QDialog):
         username = self.lineEdit.text()
         password = self.lineEdit_2.text()
 
-        ip = '192.168.56.1'
+        ip = '192.168.47.126'
         port = 9999
 
         if not self.client_manager.connect_to_server(ip, port):
@@ -311,7 +311,7 @@ class RegistrationWindow(qtw.QDialog):
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('client/registerUi.ui', self)
+        uic.loadUi('registerUi.ui', self)
         self.pushButton.clicked.connect(self.register)
         self.pushButton_2.clicked.connect(self.show_login_window)
 
@@ -321,7 +321,7 @@ class RegistrationWindow(qtw.QDialog):
         username = self.lineEdit.text()
         password = self.lineEdit_2.text()
 
-        ip = '192.168.56.1'
+        ip = '192.168.47.126'
         port = 9999
 
         if not self.client_manager.connect_to_server(ip, port):

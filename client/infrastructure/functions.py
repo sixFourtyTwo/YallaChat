@@ -54,6 +54,8 @@ def commandHandler(client, command):
         GAUColl(client)
     elif(command == 'GRU'):
         getRandomUserColl(client)
+    elif(command == 'GGM'):
+        getGroupMessagesColl(client)
 
 def addFriend(client, user):
     message = 'ADDF ' + user
@@ -227,6 +229,12 @@ def getAllUsers(client):
     client.send(msg.encode('utf-8'))
     return client.recv(1024).decode('utf-8')
 
+def getGroupMessages(client, name):
+    msg = 'GGM ' + name
+    client.send(msg.encode('utf-8'))
+    
+    return client.recv(1024).decode('utf-8')
+
 def codeHandler(code):
     if(code == '100'):
         return 'Success'
@@ -372,3 +380,7 @@ def GAUColl(client):
 
 def getRandomUserColl(client):
     print(getRandomUser(client))
+
+def getGroupMessagesColl(client):
+    name = input('Group name: ')
+    print(getGroupMessages(client, name))
