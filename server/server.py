@@ -67,7 +67,9 @@ def handler(conn, addr):
                 elif(cmnd == 'GAU'):
                     Sfunc.getUsers(conn, cursor)
 
-                #elif(cmnd == '')
+                elif(cmnd == 'GGM'):
+                    name = message[1]
+                    Sfunc.getGroupMessages(conn, cursor, name, currentUser)
 
                 elif(cmnd == 'GOFriends'):
                     friends = message[1]
