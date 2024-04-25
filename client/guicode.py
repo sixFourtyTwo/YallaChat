@@ -68,6 +68,7 @@ class ChatMainWindow(qtw.QDialog):
         self.search_layout.addWidget(self.search_input)
         self.search_button = qtw.QPushButton("Search")
         self.search_button.setStyleSheet("background-color: rgba(85, 98, 112, 255); color: rgba(255, 255, 255, 200); border-radius: 5px;")
+        self.search_button.clicked.connect(self.search_online_users)
         self.search_layout.addWidget(self.search_button)
 
         # Display online users with an "Add Friend" button next to each
@@ -89,11 +90,31 @@ class ChatMainWindow(qtw.QDialog):
         self.new_chat_button.setStyleSheet("background-color: rgba(85, 98, 112, 255); color: rgba(255, 255, 255, 200); border-radius: 5px;")
         self.new_chat_button.clicked.connect(self.new_chat)
         self.layout.addWidget(self.new_chat_button)
+        
+        # Add a "New Chat" button to open a window for starting a new chat with a friend
+        """ self.refresh_button = qtw.QPushButton("Refresh")
+        self.refresh_button.setStyleSheet("background-color: rgba(85, 98, 112, 255); color: rgba(255, 255, 255, 200); border-radius: 5px;")
+        #self.refresh_button.clicked.connect(self.refreshChats)
+        self.layout.addWidget(self.refresh_button)"""
 
         self.layout.addStretch()
+        
+    def refreshChats(self):
+        """self.recent_chats_list.clear()
+        for chat in self.chat_list:
+            chat_button = qtw.QPushButton(chat)
+            chat_button.clicked.connect(lambda checked, button=chat_button: self.open_chat_window(button))
+            item = qtw.QListWidgetItem()
+            item.setSizeHint(chat_button.sizeHint())
+            self.recent_chats_list.addItem(item)
+            self.recent_chats_list.setItemWidget(item, chat_button)
+        self.layout.addWidget(self.recent_chats_list)"""
+        pass
 
     def search_online_users(self):
-        pass
+        search_window = SearchWindow(self.client_manager.get_client(), self.search_input)
+        search_window.exec_()
+        #qtw.QMessageBox.warning(self, "Attention", funcs.isOnline(self.client_manager.get_client(), search_input.text()))
 
     def view_friends(self):
         friends_window = FriendsWindow(self.client_manager.get_client())
@@ -101,9 +122,10 @@ class ChatMainWindow(qtw.QDialog):
 
     def new_chat(self):
         new_chat_window = NewChatWindow(self.client_manager.get_client())
-        if (new_chat_window.exec_()==0):
-            chat_list = funcs.dispChats(self.client_manager.get_client())
-            self.show_chat_list(chat_list)
+        new_chat_window.exec_()
+        #if (new_chat_window.exec_()==0):
+        #   chat_list = funcs.dispChats(self.client_manager.get_client())
+        #   self.show_chat_list(chat_list)
 
     def open_chat_window(self, button):
         chat_title = button.text()
@@ -200,6 +222,25 @@ class ChattingWindow(qtw.QDialog):
         self.running = False  # Stop the fetch thread when the window is closed
         event.accept()
 
+class SearchWindow(qtw.QDialog):
+    def __init__(self, client, user):
+        super().__init__()
+        self.user = user
+        self.client = client
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle("User Search")
+        self.layout = qtw.QVBoxLayout(self)
+        reply=funcs.isOnline(self.client, self.user.text())
+        reply2= self.user.text()+" is "+reply
+        self.search_label = qtw.QLabel(reply2)
+        self.search_label.setStyleSheet("font-size: 18px; color: rgba(0, 0, 0, 200);")
+        self.layout.addWidget(self.search_label, alignment=qtc.Qt.AlignCenter)
+        self.start_chat2_button = qtw.QPushButton("Start Chat")
+        self.start_chat2_button.clicked.connect(lambda: funcs.startChat(self.client, self.user.text(), "New Chat"))
+        self.layout.addWidget(self.start_chat2_button)
+        self.accept()
 
 class NewChatWindow(qtw.QDialog):
     def __init__(self, client):
@@ -215,6 +256,9 @@ class NewChatWindow(qtw.QDialog):
         self.start_chat_button = qtw.QPushButton("Start Chat")
         self.start_chat_button.clicked.connect(lambda: funcs.startChat(self.client, self.input_field.text(), "New Chat"))
         self.layout.addWidget(self.start_chat_button)
+        self.random_chat_button = qtw.QPushButton("Random Chat")
+        self.random_chat_button.clicked.connect(lambda: funcs.startChat(self.client, funcs.getRandomUser(self.client), "New Chat"))
+        self.layout.addWidget(self.random_chat_button)
         self.accept()
 
 class SignInWindow(qtw.QDialog):
@@ -387,6 +431,10 @@ class FriendsWindow(qtw.QDialog):
         self.layout.addWidget(self.add_friend_button)
 
         self.layout.addStretch()
+        
+        # Display friends and their online status
+        friends = funcs.dispFriends(self.client)
+        self.friends_list.addItem(friends)
 
     def check_pending_requests(self):
         pending_requests_window = PendingRequestsWindow(self.client)
