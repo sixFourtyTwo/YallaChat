@@ -220,11 +220,10 @@ def send_group_message(conn, c, sender_id, group_id, message):
     
     conn.commit()
 
-def get_group_messages(c, group_id):
+def get_group_messages(c, group_id, receiver_id):
     c.execute('''SELECT messages.* FROM messages 
-                  JOIN UserGroups AS sender_group ON messages.sender_id = sender_group.user_id
                   JOIN UserGroups AS receiver_group ON messages.receiver_id = receiver_group.user_id
-                  WHERE sender_group.group_id = ? AND receiver_group.group_id = ?''', (group_id, group_id))
+                  WHERE receiver_group.group_id = ? AND messages.receiver_id = ?''', (group_id, receiver_id))
     messages = c.fetchall()
     return messages
 def start_group(conn, c, creator_id, group_name, members):
