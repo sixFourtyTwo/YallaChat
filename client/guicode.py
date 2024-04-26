@@ -7,6 +7,8 @@ import socket
 import sys
 import threading
 import re
+import os
+from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout
 
 
 class ClientSocketManager:
@@ -63,7 +65,7 @@ class ChatMainWindow(qtw.QDialog):
         # Add a search input field and button to search for online users
         self.search_layout = qtw.QHBoxLayout()
         self.layout.addLayout(self.search_layout)
-        self.search_input = qtw.QLineEdit(placeholderText=" Search")
+        self.search_input = qtw.QLineEdit(placeholderText="Online User Check")
         self.search_input.setStyleSheet("background-color: rgba(255, 255, 255, 255); border: 1px solid rgba(0, 0, 0, 100);")
         self.search_layout.addWidget(self.search_input)
         self.search_button = qtw.QPushButton("Search")
@@ -71,13 +73,16 @@ class ChatMainWindow(qtw.QDialog):
         self.search_button.clicked.connect(self.search_online_users)
         self.search_layout.addWidget(self.search_button)
 
-        # Display online users with an "Add Friend" button next to each
-        self.online_users_label = qtw.QLabel("Online Users:")
+        # Display all server registered users
+        self.online_users_label = qtw.QLabel("Registered Users:")
         self.online_users_label.setStyleSheet("font-size: 18px; color: rgba(0, 0, 0, 200);")
         self.layout.addWidget(self.online_users_label, alignment=qtc.Qt.AlignCenter)
-        self.online_users_list = qtw.QListWidget()
+        self.online_users_list = qtw.QTextEdit()
         self.online_users_list.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
         self.layout.addWidget(self.online_users_list)
+        userlist=funcs.getAllUsers(self.client_manager.get_client())
+        userlist = userlist.replace(',', '\n')
+        self.online_users_list.setPlainText( userlist)
 
         # Add a "View Friends" button
         self.view_friends_button = qtw.QPushButton("View Friends")
@@ -113,13 +118,19 @@ class ChatMainWindow(qtw.QDialog):
                 item.setSizeHint(chat_button.sizeHint())
                 self.recent_chats_list.addItem(item)
                 self.recent_chats_list.setItemWidget(item, chat_button)
+                userlist=funcs.getAllUsers(self.client_manager.get_client())
+                userlist = userlist.replace(',', '\n')
+                self.online_users_list.setPlainText( userlist)
         except Exception as e:
             print("Error refreshing chats:", e)
 
     def search_online_users(self):
-        search_window = SearchWindow(self.client_manager.get_client(), self.search_input)
-        search_window.exec_()
-        #qtw.QMessageBox.warning(self, "Attention", funcs.isOnline(self.client_manager.get_client(), search_input.text()))
+        if self.search_input.text()!="":
+            search_window = SearchWindow(self.client_manager.get_client(), self.search_input)
+            search_window.exec_()
+        else:
+            pass
+            #qtw.QMessageBox.warning(self, "Attention", funcs.isOnline(self.client_manager.get_client(), search_input.text()))
 
     def view_friends(self):
         friends_window = FriendsWindow(self.client_manager.get_client())
@@ -170,6 +181,10 @@ class ChattingWindow(qtw.QDialog):
         self.send_button = qtw.QPushButton("Send")
         self.send_button.clicked.connect(self.send_message)
         self.layout.addWidget(self.send_button)
+        
+        self.multi_button = qtw.QPushButton("Multimedia")
+        self.multi_button.clicked.connect(self.send_multimedia)
+        self.layout.addWidget(self.multi_button)
 
         # Back button
         self.back_button = qtw.QPushButton("Back")
@@ -226,6 +241,11 @@ class ChattingWindow(qtw.QDialog):
     def closeEvent(self, event):
         self.running = False  # Stop the fetch thread when the window is closed
         event.accept()
+        
+    def send_multimedia(self):
+        myApp = MyApp()
+        myApp.exec_()
+
 
 class SearchWindow(qtw.QDialog):
     def __init__(self, client, user):
@@ -281,7 +301,7 @@ class SignInWindow(qtw.QDialog):
         username = self.lineEdit.text()
         password = self.lineEdit_2.text()
 
-        ip = '192.168.47.126'
+        ip = '192.168.56.1'
         port = 9999
 
         if not self.client_manager.connect_to_server(ip, port):
@@ -321,7 +341,7 @@ class RegistrationWindow(qtw.QDialog):
         username = self.lineEdit.text()
         password = self.lineEdit_2.text()
 
-        ip = '192.168.47.126'
+        ip = "192.168.56.1"
         port = 9999
 
         if not self.client_manager.connect_to_server(ip, port):
@@ -468,7 +488,84 @@ class FriendsWindow(qtw.QDialog):
                 qtw.QMessageBox.information(self, "Add Friend", result)
                 self.refresh_friends_list()
 
-
+class MyApp(qtw.QDialog):
+    def __init__(self):
+       super().__init__()
+       self.window_width, self.window_height =  100,50
+       self.setMinimumSize(self.window_width, self.window_height)
+       
+       layout = QVBoxLayout()
+       self.setLayout(layout)
+       
+       self.options = ('Upload Image', 'Uplaod Video', 'Upload Text', 'Upload Audio')
+       
+       self.combo = QComboBox()
+       self.combo.addItems(self.options)
+       layout.addWidget(self.combo)
+       
+       btn = QPushButton('Open')
+       btn.clicked.connect(self.launchDialog)
+       layout.addWidget(btn)
+       
+       
+    def launchDialog(self):
+       option = self.options.index(self.combo.currentText())
+       
+       if option == 0:
+           response = self.getImageName()
+       elif option == 1:
+           response = self.getVideoName()
+       elif option == 2:
+           response = self.getTextName()
+       elif option == 3:
+           response = self.getAudioName()
+           
+       if response:
+           print("Selected file:", response)
+           
+    def getImageName(self):
+       file_filter = 'Image File (*.jpg *.png);; Video File(*.mp4 *.mov);; Text File(*.txt *.docx *.pdf);; Audio File(*.mp3)'
+       response= QFileDialog.getOpenFileName(
+               parent=self,
+               caption= 'Select an image file',
+               directory= os.getcwd(),
+               filter=file_filter,
+               initialFilter= 'Image File (*.jpg *.png)'
+               )
+       return response[0]
+   
+    def getVideoName(self):
+       file_filter = 'Image File (*.jpg *.png);; Video File(*.mp4 *.mov);; Text File(*.txt *.docx *.pdf);; Audio File(*.mp3)'
+       response= QFileDialog.getOpenFileName(
+               parent=self,
+               caption= 'Select a video file',
+               directory= os.getcwd(),
+               filter=file_filter,
+               initialFilter= 'Video File(*.mp4 *.mov)'
+               )
+       return response[0]
+   
+    def getTextName(self):
+       file_filter = 'Image File (*.jpg *.png);; Video File(*.mp4 *.mov);; Text File(*.txt *.docx *.pdf);; Audio File(*.mp3)'
+       response= QFileDialog.getOpenFileName(
+               parent=self,
+               caption= 'Select a text file',
+               directory= os.getcwd(),
+               filter=file_filter,
+               initialFilter= 'Text File(*.txt *.docx *.pdf)'
+               )
+       return response[0]
+   
+    def getAudioName(self):
+       file_filter = 'Image File (*.jpg *.png);; Video File(*.mp4 *.mov);; Text File(*.txt *.docx *.pdf);; Audio File(*.mp3)'
+       response= QFileDialog.getOpenFileName(
+               parent=self,
+               caption= 'Select an audio file',
+               directory= os.getcwd(),
+               filter=file_filter,
+               initialFilter= 'Audio File(*.mp3)'
+               )
+       return response[0]
 
 
 
